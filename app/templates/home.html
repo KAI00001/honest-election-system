@@ -1,35 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Honest Election System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Home</title>
 </head>
-
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('home') }}">Honest Election System</a>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container mt-5">
-        <h1>Welcome to the Honest Election System</h1>
-        <p>Manage your election process with ease. Add voters, candidates, and more!</p>
-        <a href="{{ url_for('add_voter') }}" class="btn btn-primary btn-lg">Add Voter</a>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-primary text-white text-center py-3 mt-5">
-        <p>&copy; 2024 Honest Election System</p>
-    </footer>
-
-    <!-- Bootstrap JS Bundle (includes Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <h1>Welcome to the Honest Election System</h1>
+    <a href="{{ url_for('signup') }}" class="btn btn-primary">Sign Up</a>
+    <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
 </body>
-
 </html>
