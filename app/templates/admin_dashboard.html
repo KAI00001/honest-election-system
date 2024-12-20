@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #4A90E2;
+        }
+
+        .box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: white;
+        }
+
+        .top-box-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .top-box-container .box {
+            width: 48%;
+        }
+
+        .form-input, .button {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        .button {
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .button:hover {
+            background-color: #357ABD;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f9;
+        }
+
+        .flash-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .request-buttons button {
+            padding: 6px 12px;
+            margin: 5px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .request-buttons button.decline {
+            background-color: #d9534f;
+        }
+
+        .request-buttons button:hover {
+            background-color: #4cae4c;
+        }
+
+        .request-buttons button.decline:hover {
+            background-color: #c9302c;
+        }
+
+        .party-list-table th, .party-list-table td {
+            padding: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+
+        <div class="top-box-container">
+            <!-- Box for Party List Requests -->
+            <div class="box">
+                <h2>Pending Party List Requests</h2>
+                {% if party_list_requests %}
+                    <ul>
+                        {% for request in party_list_requests %}
+                            <li>{{ request.party_name }} - {{ request.request_status }}
+                                <div class="request-buttons">
+                                    <form action="/approve_party_list" method="POST" style="display:inline;">
+                                        <input type="hidden" name="request_id" value="{{ request.id }}">
+                                        <button type="submit">Accept</button>
+                                    </form>
+                                    <form action="/decline_party_list" method="POST" style="display:inline;">
+                                        <input type="hidden" name="request_id" value="{{ request.id }}">
+                                        <button type="submit" class="decline">Decline</button>
+                                    </form>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No pending party list requests at the moment.</p>
+                {% endif %}
+            </div>
+
+            <!-- Box for Adding Valid LRN -->
+            <div class="box">
+                <h2>Add Valid LRN</h2>
+                <form action="/admin-dashboard" method="POST">
+                    <input class="form-input" type="text" name="new_lrn" placeholder="Enter new LRN to add" required>
+                    <button class="button" type="submit">Add LRN</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Box for Voter Credentials -->
+        <div class="box">
+            <h2>Voter Credentials</h2>
+            <table>
+                <tr>
+                    <th>LRN</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+                {% for voter in voters %}
+                    <tr>
+                        <td>{{ voter.lrn }}</td>
+                        <td>{{ voter.full_name }}</td>
+                        <td>{{ voter.email }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- Box for Party Lists -->
+        <div class="box">
+            <h2>Party Lists</h2>
+            <table class="party-list-table">
+                <tr>
+                    <th>Party Name</th>
+                    <th>President</th>
+                    <th>Vice President</th>
+                    <th>Secretary</th>
+                    <th>Treasurer</th>
+                    <th>PRO</th>
+                </tr>
+                {% for party in party_lists %}
+                    <tr>
+                        <td>{{ party.party_name }}</td>
+                        <td>{{ party.president }}</td>
+                        <td>{{ party.vice_president }}</td>
+                        <td>{{ party.secretary }}</td>
+                        <td>{{ party.treasurer }}</td>
+                        <td>{{ party.pro }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- Display flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+</body>
+</html>

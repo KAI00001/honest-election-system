@@ -8,7 +8,7 @@
         /* Body styling */
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #F8C8D4, #F1D1D6); /* Pinkish peach gradient */
+            background: linear-gradient(135deg, #A7C7E7, #6495ED); /* Lighter blue gradient background */
             margin: 0;
             padding: 0;
             display: flex;
@@ -32,7 +32,7 @@
         h1 {
             margin-bottom: 60px; /* Increased margin for better spacing */
             font-size: 3rem; /* Larger heading */
-            color: #E06A80; /* Peachish pink color for the header */
+            color: #4169E1; /* Royal blue for the header */
             font-weight: 700; /* Bold header */
         }
 
@@ -43,18 +43,26 @@
             margin: 20px auto; /* Increase margin for spacing */
             padding: 20px; /* Increased padding for larger buttons */
             font-size: 1.6rem; /* Larger font size */
-            background-color: #F08080; /* Light peach background */
+            background-color: #4169E1; /* Royal blue background */
             color: white;
             border: none;
             border-radius: 10px; /* Rounded corners */
             cursor: pointer;
-            transition: transform 0.3s;
-            outline: none; /* Remove the blue outline when focused */
+            transition: transform 0.3s, background-color 0.3s;
+            outline: none; /* Remove the blue outline */
+            box-shadow: none; /* Remove the box-shadow that appears on focus */
         }
 
-        /* Removed hover effect for buttons */
+        /* Hover effect for buttons */
+        .button:hover {
+            background-color: #3B5A9B; /* Slightly darker royal blue on hover */
+            transform: scale(1.05); /* Slightly larger on hover */
+        }
+
+        /* Remove outline on focus */
         .button:focus {
-            outline: none;
+            outline: none !important; /* Make sure no outline appears */
+            box-shadow: none !important; /* Make sure no box-shadow appears */
         }
 
         /* Responsive layout for smaller screens */

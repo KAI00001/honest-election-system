@@ -1,5 +1,148 @@
-<form action="/party_list" method="POST">
-    <input type="text" name="name" placeholder="Party List Name" required>
-    <textarea name="description" placeholder="Description"></textarea>
-    <button type="submit">Submit Request</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Party List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #4A90E2;
+            text-align: center;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .form-input, .form-button, .position-input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        .form-button {
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .form-button:hover {
+            background-color: #357ABD;
+        }
+
+        .flash-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .position-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Create Party List</h1>
+
+        <!-- Display flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="form-container">
+            <form action="/create-party-list" method="POST">
+                <label for="party_name">Party List Name:</label>
+                <input class="form-input" type="text" name="party_name" id="party_name" placeholder="Enter party list name" required>
+
+                <div class="position-container">
+                    <label for="president">President:</label>
+                    <select class="position-input" name="president" required>
+                        <option value="">Select a President</option>
+                        {% for voter in voters %}
+                            <option value="{{ voter.id }}">{{ voter.full_name }} ({{ voter.lrn }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="position-container">
+                    <label for="vice_president">Vice President:</label>
+                    <select class="position-input" name="vice_president" required>
+                        <option value="">Select a Vice President</option>
+                        {% for voter in voters %}
+                            <option value="{{ voter.id }}">{{ voter.full_name }} ({{ voter.lrn }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="position-container">
+                    <label for="secretary">Secretary:</label>
+                    <select class="position-input" name="secretary" required>
+                        <option value="">Select a Secretary</option>
+                        {% for voter in voters %}
+                            <option value="{{ voter.id }}">{{ voter.full_name }} ({{ voter.lrn }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="position-container">
+                    <label for="treasurer">Treasurer:</label>
+                    <select class="position-input" name="treasurer" required>
+                        <option value="">Select a Treasurer</option>
+                        {% for voter in voters %}
+                            <option value="{{ voter.id }}">{{ voter.full_name }} ({{ voter.lrn }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="position-container">
+                    <label for="pro">PRO:</label>
+                    <select class="position-input" name="pro" required>
+                        <option value="">Select a PRO</option>
+                        {% for voter in voters %}
+                            <option value="{{ voter.id }}">{{ voter.full_name }} ({{ voter.lrn }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button class="form-button" type="submit">Submit Party List</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
