@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Web Application</title>
+    <style>
+        /* Body styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #F8C8D4, #F1D1D6); /* Pinkish peach gradient */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        /* Container styling */
+        .container {
+            width: 100%;
+            max-width: 800px; /* Increased container width */
+            padding: 60px; /* Increased padding for a more spacious feel */
+            background-color: #ffffff;
+            border-radius: 15px; /* Slightly more rounded corners */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* More refined shadow */
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 60px; /* Increased margin for better spacing */
+            font-size: 3rem; /* Larger heading */
+            color: #E06A80; /* Peachish pink color for the header */
+            font-weight: 700; /* Bold header */
+        }
+
+        /* Button styling */
+        .button {
+            display: block;
+            width: 80%; /* Keep width to 80% */
+            margin: 20px auto; /* Increase margin for spacing */
+            padding: 20px; /* Increased padding for larger buttons */
+            font-size: 1.6rem; /* Larger font size */
+            background-color: #F08080; /* Light peach background */
+            color: white;
+            border: none;
+            border-radius: 10px; /* Rounded corners */
+            cursor: pointer;
+            transition: transform 0.3s;
+            outline: none; /* Remove the blue outline when focused */
+        }
+
+        /* Removed hover effect for buttons */
+        .button:focus {
+            outline: none;
+        }
+
+        /* Responsive layout for smaller screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px; /* Reduced padding for small screens */
+            }
+
+            h1 {
+                font-size: 2.5rem; /* Adjust heading size for smaller screens */
+            }
+
+            .button {
+                font-size: 1.4rem; /* Adjust button font size for smaller screens */
+                padding: 18px; /* Adjust button padding for smaller screens */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome to the Election Portal</h1>
+        
+        <a href="/voters">
+            <button class="button">Voters</button>
+        </a>
+        <a href="/create-party-list">
+            <button class="button">Create Party List</button>
+        </a>
+        <a href="/admin">
+            <button class="button">Admin</button>
+        </a>
+    </div>
+
+</body>
+</html>
