@@ -89,27 +89,27 @@
         .request-buttons button {
             padding: 6px 12px;
             margin: 5px;
-            background-color: #5cb85c;
-            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
 
-        .request-buttons button.decline {
-            background-color: #d9534f;
+        .request-buttons button.approve {
+            background-color: #5cb85c; /* Green */
+            color: white;
         }
 
-        .request-buttons button:hover {
+        .request-buttons button.approve:hover {
             background-color: #4cae4c;
+        }
+
+        .request-buttons button.decline {
+            background-color: #d9534f; /* Red */
+            color: white;
         }
 
         .request-buttons button.decline:hover {
             background-color: #c9302c;
-        }
-
-        .party-list-table th, .party-list-table td {
-            padding: 12px;
         }
     </style>
 </head>
@@ -118,29 +118,38 @@
     <div class="container">
         <h1>Admin Dashboard</h1>
 
+        <!-- Flash Message Section -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         <div class="top-box-container">
-            <!-- Box for Party List Requests -->
+            <!-- Box for Results of the Votes -->
             <div class="box">
-                <h2>Pending Party List Requests</h2>
-                {% if party_list_requests %}
-                    <ul>
-                        {% for request in party_list_requests %}
-                            <li>{{ request.party_name }} - {{ request.request_status }}
-                                <div class="request-buttons">
-                                    <form action="/approve_party_list" method="POST" style="display:inline;">
-                                        <input type="hidden" name="request_id" value="{{ request.id }}">
-                                        <button type="submit">Accept</button>
-                                    </form>
-                                    <form action="/decline_party_list" method="POST" style="display:inline;">
-                                        <input type="hidden" name="request_id" value="{{ request.id }}">
-                                        <button type="submit" class="decline">Decline</button>
-                                    </form>
-                                </div>
-                            </li>
+                <h2>Results of the Votes</h2>
+                {% if vote_results %}
+                    <table class="results-table">
+                        <tr>
+                            <th>Party Name</th>
+                            <th>Total Votes</th>
+                        </tr>
+                        {% for result in vote_results %}
+                            <tr>
+                                <td>{{ result.party_name }}</td>
+                                <td>{{ result.total_votes }}</td>
+                            </tr>
                         {% endfor %}
-                    </ul>
+                    </table>
                 {% else %}
-                    <p>No pending party list requests at the moment.</p>
+                    <p>No voting results available at the moment.</p>
                 {% endif %}
             </div>
 
@@ -173,43 +182,74 @@
             </table>
         </div>
 
-        <!-- Box for Party Lists -->
+        <!-- Box for Pending Party Lists -->
         <div class="box">
-            <h2>Party Lists</h2>
-            <table class="party-list-table">
-                <tr>
-                    <th>Party Name</th>
-                    <th>President</th>
-                    <th>Vice President</th>
-                    <th>Secretary</th>
-                    <th>Treasurer</th>
-                    <th>PRO</th>
-                </tr>
-                {% for party in party_lists %}
+            <h2>Pending Party Lists Application</h2>
+            {% if party_list_requests %}
+                <table class="party-list-table">
                     <tr>
-                        <td>{{ party.party_name }}</td>
-                        <td>{{ party.president }}</td>
-                        <td>{{ party.vice_president }}</td>
-                        <td>{{ party.secretary }}</td>
-                        <td>{{ party.treasurer }}</td>
-                        <td>{{ party.pro }}</td>
+                        <th>Party Name</th>
+                        <th>President</th>
+                        <th>Vice President</th>
+                        <th>Secretary</th>
+                        <th>Treasurer</th>
+                        <th>PRO</th>
+                        <th>Actions</th>
                     </tr>
-                {% endfor %}
-            </table>
+                    {% for party in party_list_requests %}
+                        <tr>
+                            <td>{{ party.party_name }}</td>
+                            <td>{{ party.president_lrn }}</td>
+                            <td>{{ party.vice_president_lrn }}</td>
+                            <td>{{ party.secretary_lrn }}</td>
+                            <td>{{ party.treasurer_lrn }}</td>
+                            <td>{{ party.pro_lrn }}</td>
+                            <td>
+                                <div class="request-buttons">
+                                    <form action="/admin-dashboard" method="POST" style="display:inline;">
+                                        <input type="hidden" name="party_list_id" value="{{ party.id }}">
+                                        <button type="submit" class="approve" name="approve_party_list">Accept</button>
+                                    </form>
+                                    <form action="/admin-dashboard" method="POST" style="display:inline;">
+                                        <input type="hidden" name="party_list_id" value="{{ party.id }}">
+                                        <button type="submit" class="decline" name="decline_party_list">Decline</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>No pending party list requests at the moment.</p>
+            {% endif %}
         </div>
 
-        <!-- Display flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div>
-                    {% for category, message in messages %}
-                        <div class="flash-message {{ category }}">
-                            {{ message }}
-                        </div>
+        <!-- Box for Pending Solo Applications -->
+        <div class="box">
+            <h2>Pending Solo Applications</h2>
+            {% if solo_applications %}
+                <ul>
+                    {% for application in solo_applications %}
+                        <li>
+                            <strong>{{ application.position }}</strong> - {{ application.lrn }}
+                            <div class="request-buttons">
+                                <form action="/admin-dashboard" method="POST" style="display:inline;">
+                                    <input type="hidden" name="application_id" value="{{ application.id }}">
+                                    <button type="submit" class="approve" name="approve_solo_application">Accept</button>
+                                </form>
+                                <form action="/admin-dashboard" method="POST" style="display:inline;">
+                                    <input type="hidden" name="application_id" value="{{ application.id }}">
+                                    <button type="submit" class="decline" name="decline_solo_application">Decline</button>
+                                </form>
+                            </div>
+                        </li>
                     {% endfor %}
-                </div>
+                </ul>
+            {% else %}
+                <p>No pending solo applications at the moment.</p>
             {% endif %}
-        {% endwith %}
+        </div>
+
     </div>
 
 </body>

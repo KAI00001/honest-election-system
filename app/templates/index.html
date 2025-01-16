@@ -65,6 +65,32 @@
             box-shadow: none !important; /* Make sure no box-shadow appears */
         }
 
+        /* Circular Edit Button */
+        .edit-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #333333; /* Dark gray background */
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .edit-button:hover {
+            background-color: #444444; /* Slightly lighter gray on hover */
+            transform: scale(1.1); /* Slightly enlarge on hover */
+        }
+
         /* Responsive layout for smaller screens */
         @media (max-width: 600px) {
             .container {
@@ -79,11 +105,19 @@
                 font-size: 1.4rem; /* Adjust button font size for smaller screens */
                 padding: 18px; /* Adjust button padding for smaller screens */
             }
+
+            .edit-button {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
         }
 
     </style>
 </head>
 <body>
+    <!-- Circular Edit Button -->
+    <button class="edit-button" onclick="editFunction()">EDIT</button>
 
     <div class="container">
         <h1>Welcome to the Election Portal</h1>
@@ -91,13 +125,19 @@
         <a href="/voters">
             <button class="button">Voters</button>
         </a>
-        <a href="/create-party-list">
-            <button class="button">Create Party List</button>
+        <a href="/application">
+            <button class="button">Application</button>
         </a>
         <a href="/admin">
             <button class="button">Admin</button>
         </a>
     </div>
 
+    <script>
+        function editFunction() {
+            // Redirect to an edit page or trigger an action
+            window.location.href = '/edit-page'; // Replace with the desired URL
+        }
+    </script>
 </body>
 </html>

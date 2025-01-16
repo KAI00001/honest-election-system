@@ -3,23 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4A90E2;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 12px;
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        button:hover {
+            background-color: #357ABD;
+        }
+
+        .flash-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .flash-message.info {
+            background-color: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        .flash-message.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+    </style>
 </head>
 <body>
-    <h1>Sign Up</h1>
-    <form method="POST">
-        <input type="text" name="aadhaar" placeholder="Aadhaar Number" required><br>
-        <input type="text" name="fname" placeholder="First Name" required><br>
-        <input type="text" name="lname" placeholder="Last Name" required><br>
-        <input type="text" name="gender" placeholder="Gender" required><br>
-        <input type="text" name="birthday" placeholder="Birthday (YYYY-MM-DD)" required><br>
-        <input type="text" name="phone" placeholder="Phone" required><br>
-        <input type="email" name="email" placeholder="Email" required><br>
-        <input type="text" name="locality" placeholder="Locality" required><br>
-        <input type="text" name="city" placeholder="City" required><br>
-        <input type="text" name="state" placeholder="State" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
-        <button type="submit">Sign Up</button>
-    </form>
+
+    <div class="container">
+        <h1>Login with LRN</h1>
+
+        <!-- Form to submit LRN -->
+        <form method="POST" action="{{ url_for('login_lrn') }}">
+            <input type="text" name="lrn" placeholder="Enter LRN" required>
+            <button type="submit">Login</button>
+        </form>        
+
+        <!-- Display flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
 </body>
 </html>

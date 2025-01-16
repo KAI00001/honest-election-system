@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        .form-select {
+            color: #000 !important;
+            background-color: #fff !important;
+            border: 1px solid #ced4da;
+            height: 40px;
+        }
+
+        .form-select option {
+            color: #000 !important;
+            background-color: #fff !important;
+            font-size: 16px;
+        }
+
+        .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+        }
+
+        .alert {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Vote for Your Preferred Candidate</h1>
+
+        <!-- Flash message for errors -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert alert-danger">
+                {% for category, message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/vote-page">
+            <div class="mb-4">
+                <label for="position" class="form-label">Select Position</label>
+                <select class="form-select" id="position" name="position" required onchange="updateCandidates()">
+                    <option value="" disabled selected>Select a position</option>
+                    {% for position in positions %}
+                        <option value="{{ position.id }}" {% if position.id == request.form.get('position') %} selected {% endif %}>
+                            {{ position.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="candidate" class="form-label">Select Candidate</label>
+                <select class="form-select" id="candidate" name="candidate" required>
+                    <option value="" disabled selected>Select a candidate</option>
+                </select>
+            </div>
+
+            <input type="hidden" id="candidate_type" name="candidate_type">
+
+            <button type="submit" class="btn btn-primary">Submit Vote</button>
+        </form>
+
+        <hr>
+
+        <h2 class="mt-5">Ongoing Results</h2>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Candidate</th>
+                    <th>Votes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in vote_results %}
+                    <tr>
+                        <td>{{ result.position }}</td>
+                        <td>
+                            {% if result.candidate_type == 'party_member' %}
+                                {% for party in party_lists %}
+                                    {% if party.party_list_id == result.candidate_id %}
+                                        {{ party.president_name }} ({{ party.party_name }})
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {% for solo in solo_applicants %}
+                                    {% if solo.id == result.candidate_id %}
+                                        {{ solo.name }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                        <td>{{ result.votes }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+    <script>
+        function updateCandidates() {
+            var positionId = document.getElementById('position').value;
+            var candidateSelect = document.getElementById('candidate');
+            candidateSelect.innerHTML = '<option value="" disabled selected>Select a candidate</option>';
+
+            if (positionId) {
+                fetch(`/vote-page?position=${positionId}`, {
+                    method: 'GET',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.candidates && data.candidates.length > 0) {
+                        data.candidates.forEach(candidate => {
+                            var option = document.createElement('option');
+                            option.value = candidate.id;
+                            option.textContent = candidate.name;
+
+                            // Set the candidate type as a hidden field
+                            option.dataset.type = candidate.type;
+
+                            candidateSelect.appendChild(option);
+                        });
+                    } else {
+                        var noOption = document.createElement('option');
+                        noOption.value = '';
+                        noOption.disabled = true;
+                        noOption.textContent = 'No candidates available';
+                        candidateSelect.appendChild(noOption);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching candidates:', error);
+                    var noOption = document.createElement('option');
+                    noOption.value = '';
+                    noOption.disabled = true;
+                    noOption.textContent = 'Error fetching candidates';
+                    candidateSelect.appendChild(noOption);
+                });
+            }
+        }
+
+        // Update candidate type when a candidate is selected
+        document.getElementById('candidate').addEventListener('change', function() {
+            var selectedOption = this.options[this.selectedIndex];
+            var candidateType = selectedOption.dataset.type;
+            document.getElementById('candidate_type').value = candidateType;
+        });
+    </script>
+</body>
+</html>

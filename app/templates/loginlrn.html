@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .container h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            height: 20px;
+        }
+
+        .flash-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Register Details</h2>
+
+        <!-- Display Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-message">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        <form id="registerForm" action="/edit-page" method="POST">
+            <div class="form-group">
+                <input type="text" id="lrn" name="lrn" class="form-control" 
+                       placeholder="Enter LRN" required 
+                       pattern="\d+" title="LRN must be a valid number">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" name="password" class="form-control" 
+                       placeholder="Enter Password" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="full_name" name="full_name" class="form-control" 
+                       placeholder="Enter Full Name" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" name="email" class="form-control" 
+                       placeholder="Enter Email" required>
+            </div>
+            <button type="submit" class="btn">Register</button>
+            <div id="error-message" class="error-message" aria-live="polite"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
+            const lrnField = document.getElementById('lrn');
+            const passwordField = document.getElementById('password');
+            const fullNameField = document.getElementById('full_name');
+            const emailField = document.getElementById('email');
+            const errorMessage = document.getElementById('error-message');
+
+            if (lrnField.value.trim() === '') {
+                e.preventDefault();
+                errorMessage.textContent = "LRN cannot be empty.";
+            } else if (!/^\d+$/.test(lrnField.value)) {
+                e.preventDefault();
+                errorMessage.textContent = "LRN must be a valid number.";
+            } else if (passwordField.value.trim() === '') {
+                e.preventDefault();
+                errorMessage.textContent = "Password cannot be empty.";
+            } else if (fullNameField.value.trim() === '') {
+                e.preventDefault();
+                errorMessage.textContent = "Full Name cannot be empty.";
+            } else if (emailField.value.trim() === '' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value)) {
+                e.preventDefault();
+                errorMessage.textContent = "Email must be a valid email address.";
+            } else {
+                errorMessage.textContent = '';
+                const submitButton = this.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>

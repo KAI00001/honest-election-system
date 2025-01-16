@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit LRN</title>
+    <style>
+        /* Global body styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2196F3, #64B5F6); /* Blue gradient */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Form container styling */
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Heading styling */
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #2196F3; /* Blue color */
+            font-weight: bold;
+        }
+
+        /* Input field styling */
+        .input-field {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        /* Submit button styling */
+        .submit-button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            background-color: #2196F3; /* Matching blue */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .submit-button:hover {
+            background-color: #1976D2; /* Darker blue on hover */
+            transform: scale(1.05);
+        }
+
+        /* Flash messages styling (if any) */
+        .flash-message {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Edit LRN</h1>
+        
+        <!-- Flash message for errors or success -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+            {% for category, message in messages %}
+                <li class="flash-message">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Form for editing LRN -->
+        <form action="/submit-lrn" method="POST">
+            <input class="input-field" type="text" name="lrn" placeholder="Enter LRN" required>
+            <input class="input-field" type="password" name="password" placeholder="Enter Password" required>
+            <button class="submit-button" type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
