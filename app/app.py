@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request, redirect, flash, render_template, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import InternalServerError
 from .db_connection import create_connection
+from flask_cors import CORS
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Replace with a secure key
@@ -265,9 +267,6 @@ def application():
 
     return render_template('application.html')
 
-
-
-
 # Edit Page Route
 @app.route('/edit-page', methods=['GET', 'POST'])
 def edit_page():
@@ -289,7 +288,7 @@ def edit_page():
 
         try:
             cursor = connection.cursor(dictionary=True)
-            
+
             # Check if the LRN exists in the valid_lrns table
             cursor.execute("SELECT * FROM valid_lrns WHERE lrn = %s", (lrn,))
             valid_lrn = cursor.fetchone()
@@ -308,16 +307,22 @@ def edit_page():
                     flash("Password has already been set and cannot be changed.", "danger")
                 else:
                     # Update the password, full name, and email
-                    cursor.execute("UPDATE voters SET password = %s, full_name = %s, email = %s WHERE lrn = %s", 
-                                   (new_password, full_name, email, lrn))
-                    flash("Password, full name, and email updated successfully!", "success")
+                    cursor.execute("""
+                        UPDATE voters
+                        SET password = %s, full_name = %s, email = %s
+                        WHERE lrn = %s
+                    """, (new_password, full_name, email, lrn))
+                    flash("Password, full name, and email updated successfully!", "success")  # Success message
             else:
                 # Insert new voter data into the database
-                cursor.execute("INSERT INTO voters (lrn, full_name, email, password) VALUES (%s, %s, %s, %s)", 
-                               (lrn, full_name, email, new_password))
-                flash("Password, full name, and email set successfully!", "success")
+                cursor.execute("""
+                    INSERT INTO voters (lrn, full_name, email, password)
+                    VALUES (%s, %s, %s, %s)
+                """, (lrn, full_name, email, new_password))
+                flash("Password, full name, and email set successfully!", "success")  # Success message
 
             connection.commit()
+
         except Exception as e:
             flash(f"An error occurred: {e}", "danger")
         finally:
@@ -325,7 +330,7 @@ def edit_page():
 
         return redirect(url_for('edit_page'))
 
-    return render_template('loginlrn.html')
+    return render_template('edit.html')
 
 
 # Home route to render index.html at /home
@@ -399,11 +404,24 @@ def vote_page():
         cursor.execute("SELECT * FROM positions")
         positions = cursor.fetchall()
 
+        # Create a mapping of position ID to name
+        position_map = {pos['id']: pos['name'] for pos in positions}
+
         # Fetch ongoing vote results grouped by position and candidate
         cursor.execute("""
-            SELECT position, candidate_id, COUNT(*) AS votes
-            FROM votes
-            GROUP BY position, candidate_id
+            SELECT v.position, v.candidate_id, COUNT(*) AS votes, 
+                   c.full_name, c.type, c.party_name
+            FROM votes v
+            LEFT JOIN (
+                SELECT id AS candidate_id, full_name, 'solo' AS type, NULL AS party_name
+                FROM solo_applications
+                UNION ALL
+                SELECT party_members.id AS candidate_id, party_members.full_name, 
+                       'party_member' AS type, party_lists.party_name
+                FROM party_lists
+                JOIN party_members ON party_lists.id = party_members.party_list_id
+            ) c ON v.candidate_id = c.candidate_id
+            GROUP BY v.position, v.candidate_id
         """)
         vote_results = cursor.fetchall()
 
@@ -411,10 +429,10 @@ def vote_page():
         if request.method == 'POST':
             position = request.form.get('position')
             candidate_id = request.form.get('candidate')
+            candidate_type = request.form.get('candidate_type')  # Fetch the candidate type
 
-            # Validate the form inputs
-            if not position or not candidate_id:
-                flash("You must select a position and a candidate!", "danger")
+            if not position or not candidate_id or not candidate_type:
+                flash("You must select a position, a candidate, and the candidate type!", "danger")
                 return redirect(url_for('vote_page'))
 
             voter_lrn = session.get('lrn')
@@ -427,14 +445,42 @@ def vote_page():
             existing_vote = cursor.fetchone()
 
             if existing_vote:
-                flash(f"You have already voted for {position}!", "danger")
+                flash(f"You have already voted for {position_map.get(int(position), 'this position')}!", "danger")
                 return redirect(url_for('vote_page'))
 
+            # Debug: Check the candidate type and ID
+            print(f"Voter: {voter_lrn}, Position: {position}, Candidate ID: {candidate_id}, Type: {candidate_type}")
+
+            # Validate candidate based on type (solo or party)
+            if candidate_type == 'party_member':
+                cursor.execute("""
+                    SELECT party_members.id
+                    FROM party_members
+                    JOIN party_lists ON party_members.party_list_id = party_lists.id
+                    WHERE party_members.id = %s AND party_lists.status = 'approved'
+                """, (candidate_id,))
+                valid_candidate = cursor.fetchone()
+
+                if not valid_candidate:
+                    flash("Invalid party candidate selected.", "danger")
+                    return redirect(url_for('vote_page'))
+
+            elif candidate_type == 'solo':
+                cursor.execute("""
+                    SELECT id FROM solo_applications
+                    WHERE id = %s AND status = 'approved'
+                """, (candidate_id,))
+                valid_candidate = cursor.fetchone()
+
+                if not valid_candidate:
+                    flash("Invalid solo candidate selected.", "danger")
+                    return redirect(url_for('vote_page'))
+
             # Insert the vote into the votes table
-            cursor.execute(
-                "INSERT INTO votes (voter_lrn, position, candidate_id) VALUES (%s, %s, %s)",
-                (voter_lrn, position, candidate_id)
-            )
+            cursor.execute("""
+                INSERT INTO votes (voter_lrn, position, candidate_id)
+                VALUES (%s, %s, %s)
+            """, (voter_lrn, position, candidate_id))
             connection.commit()
             flash("Vote submitted successfully!", "success")
             return redirect(url_for('vote_page'))
@@ -442,48 +488,51 @@ def vote_page():
         # Handle GET request to fetch candidates based on selected position
         position_id = request.args.get('position')
         if position_id:
-            try:
-                # Fetch approved solo applicants based on the position
-                cursor.execute("""
-                    SELECT * FROM solo_applications WHERE position = %s AND status = 'approved'
-                """, (position_id,))
-                solo_candidates = cursor.fetchall()
+            position_name = position_map.get(int(position_id))  # Ensure position_id is integer
 
-                # Fetch approved party lists for president and vice president, joining with party_members
-                cursor.execute("""
-                    SELECT party_lists.id AS party_list_id, party_lists.party_name, 
-                           party_members.full_name AS president_name, 
-                           party_members.position
-                    FROM party_lists
-                    JOIN party_members ON party_lists.id = party_members.party_list_id
-                    WHERE party_lists.status = 'approved' 
-                    AND party_members.position = 'president'  -- Only fetch president candidates
-                """)
-                party_lists = cursor.fetchall()
+            if position_name:
+                try:
+                    # Fetch approved solo applicants based on the position
+                    cursor.execute("""
+                        SELECT id AS candidate_id, full_name 
+                        FROM solo_applications 
+                        WHERE position = %s AND status = 'approved'
+                    """, (position_name,))
+                    solo_candidates = cursor.fetchall()
 
-                # Combine solo applicants and party lists candidates
-                candidates = []
-                for solo in solo_candidates:
-                    candidates.append({
-                        'id': solo['id'],
-                        'name': solo['name'],  # Name of solo applicant
-                        'type': 'solo'
-                    })
+                    # Fetch approved party list members for the selected position
+                    cursor.execute("""
+                        SELECT party_members.id AS candidate_id, party_lists.party_name, party_members.full_name
+                        FROM party_lists
+                        JOIN party_members ON party_lists.id = party_members.party_list_id
+                        WHERE party_lists.status = 'approved' AND party_members.position = %s
+                    """, (position_name,))
+                    party_lists = cursor.fetchall()
 
-                for party in party_lists:
-                    candidates.append({
-                        'id': party['party_list_id'],
-                        'name': party['president_name'],  # President's name for party list
-                        'type': 'party_member',
-                        'party_name': party['party_name']
-                    })
+                    # Combine solo applicants and party list members
+                    candidates = []
+                    for solo in solo_candidates:
+                        candidates.append({
+                            'id': solo['candidate_id'],
+                            'name': solo['full_name'],
+                            'type': 'solo'
+                        })
 
-                # Return the candidates in JSON format for the frontend to populate the dropdown
-                return jsonify({'candidates': candidates})
+                    for party in party_lists:
+                        candidates.append({
+                            'id': party['candidate_id'],
+                            'name': party['full_name'],
+                            'type': 'party_member',
+                            'party_name': party['party_name']
+                        })
 
-            except Exception as e:
-                flash(f"Error fetching candidates: {e}", "danger")
-                return jsonify({'error': 'Error fetching candidates'}), 500
+                    if not candidates:
+                        return jsonify({'message': 'No candidates available for this position.'})
+                    return jsonify({'candidates': candidates})
+
+                except Exception as e:
+                    flash(f"Error fetching candidates: {e}", "danger")
+                    return jsonify({'error': 'Error fetching candidates'}), 500
 
         # Render the vote page with fetched data
         return render_template(

@@ -65,10 +65,21 @@
             transform: scale(1.05);
         }
 
-        /* Flash messages styling (if any) */
+        /* Flash messages styling */
         .flash-message {
-            color: red;
+            color: white;
             font-weight: bold;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .flash-message.danger {
+            background-color: #f44336; /* Red for errors */
+        }
+
+        .flash-message.success {
+            background-color: #4CAF50; /* Green for success */
         }
     </style>
 </head>
@@ -81,16 +92,18 @@
         {% if messages %}
             <ul>
             {% for category, message in messages %}
-                <li class="flash-message">{{ message }}</li>
+                <li class="flash-message {{ category }}">{{ message }}</li>
             {% endfor %}
             </ul>
         {% endif %}
         {% endwith %}
 
         <!-- Form for editing LRN -->
-        <form action="/submit-lrn" method="POST">
+        <form action="/edit-page" method="POST">
             <input class="input-field" type="text" name="lrn" placeholder="Enter LRN" required>
             <input class="input-field" type="password" name="password" placeholder="Enter Password" required>
+            <input class="input-field" type="text" name="full_name" placeholder="Enter Full Name" required>
+            <input class="input-field" type="email" name="email" placeholder="Enter Email" required>
             <button class="submit-button" type="submit">Submit</button>
         </form>
     </div>
