@@ -31,20 +31,25 @@
         .btn {
             width: 100%;
         }
+
+        .no-candidates {
+            color: red;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Vote for Your Preferred Candidate</h1>
 
-        <!-- Flash message for errors -->
+        <!-- Flash message for errors and success -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="alert alert-danger">
-                {% for category, message in messages %}
-                    <p>{{ message }}</p>
-                {% endfor %}
-            </div>
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endif %}
         {% endwith %}
 
@@ -66,6 +71,9 @@
                 <select class="form-select" id="candidate" name="candidate" required>
                     <option value="" disabled selected>Select a candidate</option>
                 </select>
+                <div id="no-candidates" class="no-candidates mt-2 d-none">
+                    No candidates available for the selected position.
+                </div>
             </div>
 
             <input type="hidden" id="candidate_type" name="candidate_type">
@@ -90,10 +98,8 @@
                         <td>{{ result.position }}</td>
                         <td>
                             {% if result.type == 'party_member' %}
-                                <!-- Displaying party member's name with party name -->
                                 {{ result.full_name }} ({{ result.party_name }})
                             {% else %}
-                                <!-- Displaying solo applicant's name -->
                                 {{ result.full_name }}
                             {% endif %}
                         </td>
@@ -106,60 +112,44 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.min.js"></script>
     <script>
-        // This function updates the candidate dropdown based on the selected position
         function updateCandidates() {
-            var positionId = document.getElementById('position').value;
-            var candidateSelect = document.getElementById('candidate');
-            candidateSelect.innerHTML = '<option value="" disabled selected>Select a candidate</option>';  // Clear existing options
+            const positionId = document.getElementById('position').value;
+            const candidateSelect = document.getElementById('candidate');
+            const noCandidatesMessage = document.getElementById('no-candidates');
+
+            // Reset candidate dropdown
+            candidateSelect.innerHTML = '<option value="" disabled selected>Select a candidate</option>';
+            noCandidatesMessage.classList.add('d-none');
 
             if (positionId) {
-                fetch(`/vote-page?position=${positionId}`, {
-                    method: 'GET',
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.candidates && data.candidates.length > 0) {
-                        data.candidates.forEach(candidate => {
-                            var option = document.createElement('option');
-                            option.value = candidate.id;
-                            option.textContent = candidate.name;
-
-                            // Set the candidate type in the option dataset
-                            option.dataset.type = candidate.type;
-                            option.dataset.party = candidate.party_name || '';  // Store party_name if it exists
-
-                            candidateSelect.appendChild(option);
-                        });
-                    } else {
-                        var noOption = document.createElement('option');
-                        noOption.value = '';
-                        noOption.disabled = true;
-                        noOption.textContent = 'No candidates available';
-                        candidateSelect.appendChild(noOption);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching candidates:', error);
-                    var noOption = document.createElement('option');
-                    noOption.value = '';
-                    noOption.disabled = true;
-                    noOption.textContent = 'Error fetching candidates';
-                    candidateSelect.appendChild(noOption);
-                });
+                fetch(`/vote-page?position=${positionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.candidates && data.candidates.length > 0) {
+                            data.candidates.forEach(candidate => {
+                                const option = document.createElement('option');
+                                option.value = candidate.id;
+                                option.textContent = candidate.name;
+                                option.dataset.type = candidate.type;
+                                candidateSelect.appendChild(option);
+                            });
+                        } else {
+                            noCandidatesMessage.classList.remove('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching candidates:', error);
+                        alert('Failed to fetch candidates. Please try again.');
+                    });
             }
         }
 
-        // When a candidate is selected, store the type in a hidden input field
-        document.getElementById('candidate').addEventListener('change', function() {
-            var selectedOption = this.options[this.selectedIndex];
-            var candidateType = selectedOption.dataset.type;
-            var partyName = selectedOption.dataset.party || '';  // Retrieve party name if exists
-
+        document.getElementById('candidate').addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const candidateType = selectedOption.dataset.type;
             document.getElementById('candidate_type').value = candidateType;
-
-            // Log the candidate type for debugging
-            console.log('Selected Candidate Type:', candidateType, 'Party Name:', partyName);
         });
     </script>
 </body>
 </html>
+

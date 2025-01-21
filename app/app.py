@@ -407,7 +407,7 @@ def vote_page():
         # Create a mapping of position ID to name
         position_map = {pos['id']: pos['name'] for pos in positions}
 
-        # Fetch ongoing vote results grouped by position and candidate
+        # Fetch ongoing vote results, grouped by position and candidate type
         cursor.execute("""
             SELECT v.position, v.candidate_id, COUNT(*) AS votes, 
                    c.full_name, c.type, c.party_name
@@ -415,13 +415,16 @@ def vote_page():
             LEFT JOIN (
                 SELECT id AS candidate_id, full_name, 'solo' AS type, NULL AS party_name
                 FROM solo_applications
+                WHERE status = 'approved'
                 UNION ALL
                 SELECT party_members.id AS candidate_id, party_members.full_name, 
                        'party_member' AS type, party_lists.party_name
                 FROM party_lists
                 JOIN party_members ON party_lists.id = party_members.party_list_id
+                WHERE party_lists.status = 'approved'
             ) c ON v.candidate_id = c.candidate_id
-            GROUP BY v.position, v.candidate_id
+            GROUP BY v.position, v.candidate_id, c.full_name, c.type, c.party_name
+            ORDER BY v.position, votes DESC
         """)
         vote_results = cursor.fetchall()
 
@@ -435,23 +438,31 @@ def vote_page():
                 flash("You must select a position, a candidate, and the candidate type!", "danger")
                 return redirect(url_for('vote_page'))
 
+            try:
+                position = int(position)
+                candidate_id = int(candidate_id)
+            except ValueError:
+                flash("Invalid position or candidate ID.", "danger")
+                return redirect(url_for('vote_page'))
+
             voter_lrn = session.get('lrn')
             if not voter_lrn:
                 flash("Session expired. Please log in again.", "danger")
                 return redirect(url_for('voters'))
 
-            # Check if the voter has already voted for the selected position
-            cursor.execute("SELECT * FROM votes WHERE voter_lrn = %s AND position = %s", (voter_lrn, position))
+            # Check if the voter has already voted for the selected position (solo or party)
+            cursor.execute("""
+                SELECT * FROM votes 
+                WHERE voter_lrn = %s AND position = %s AND candidate_type = %s
+            """, (voter_lrn, position, candidate_type))
             existing_vote = cursor.fetchone()
 
             if existing_vote:
-                flash(f"You have already voted for {position_map.get(int(position), 'this position')}!", "danger")
+                flash(f"You have already voted for {position_map.get(position, 'this position')}!", "danger")
                 return redirect(url_for('vote_page'))
 
-            # Debug: Check the candidate type and ID
-            print(f"Voter: {voter_lrn}, Position: {position}, Candidate ID: {candidate_id}, Type: {candidate_type}")
-
-            # Validate candidate based on type (solo or party)
+            # Validate candidate based on type (solo or party_member)
+            valid_candidate = None
             if candidate_type == 'party_member':
                 cursor.execute("""
                     SELECT party_members.id
@@ -461,10 +472,6 @@ def vote_page():
                 """, (candidate_id,))
                 valid_candidate = cursor.fetchone()
 
-                if not valid_candidate:
-                    flash("Invalid party candidate selected.", "danger")
-                    return redirect(url_for('vote_page'))
-
             elif candidate_type == 'solo':
                 cursor.execute("""
                     SELECT id FROM solo_applications
@@ -472,15 +479,15 @@ def vote_page():
                 """, (candidate_id,))
                 valid_candidate = cursor.fetchone()
 
-                if not valid_candidate:
-                    flash("Invalid solo candidate selected.", "danger")
-                    return redirect(url_for('vote_page'))
+            if not valid_candidate:
+                flash("Invalid candidate selection.", "danger")
+                return redirect(url_for('vote_page'))
 
-            # Insert the vote into the votes table
+            # Insert the vote into the votes table, including the candidate type
             cursor.execute("""
-                INSERT INTO votes (voter_lrn, position, candidate_id)
-                VALUES (%s, %s, %s)
-            """, (voter_lrn, position, candidate_id))
+                INSERT INTO votes (voter_lrn, position, candidate_id, candidate_type)
+                VALUES (%s, %s, %s, %s)
+            """, (voter_lrn, position, candidate_id, candidate_type))
             connection.commit()
             flash("Vote submitted successfully!", "success")
             return redirect(url_for('vote_page'))
@@ -488,10 +495,11 @@ def vote_page():
         # Handle GET request to fetch candidates based on selected position
         position_id = request.args.get('position')
         if position_id:
-            position_name = position_map.get(int(position_id))  # Ensure position_id is integer
+            try:
+                position_id = int(position_id)
+                position_name = position_map.get(position_id)
 
-            if position_name:
-                try:
+                if position_name:
                     # Fetch approved solo applicants based on the position
                     cursor.execute("""
                         SELECT id AS candidate_id, full_name 
@@ -530,9 +538,11 @@ def vote_page():
                         return jsonify({'message': 'No candidates available for this position.'})
                     return jsonify({'candidates': candidates})
 
-                except Exception as e:
-                    flash(f"Error fetching candidates: {e}", "danger")
-                    return jsonify({'error': 'Error fetching candidates'}), 500
+            except ValueError:
+                flash("Invalid position ID.", "danger")
+            except Exception as e:
+                flash(f"Error fetching candidates: {e}", "danger")
+                return jsonify({'error': 'Error fetching candidates'}), 500
 
         # Render the vote page with fetched data
         return render_template(
