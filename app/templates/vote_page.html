@@ -36,9 +36,28 @@
             color: red;
             font-style: italic;
         }
+
+        /* Styling for back button */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #808080;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #606060;
+        }
     </style>
 </head>
 <body>
+    <a href="{{ url_for('index') }}" class="back-button">Back</a>
+
     <div class="container mt-5">
         <h1 class="text-center">Vote for Your Preferred Candidate</h1>
 
@@ -152,4 +171,3 @@
     </script>
 </body>
 </html>
-

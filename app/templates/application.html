@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solo and Party Application</title>
     <style>
-        /* Add your custom styles here */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -27,6 +26,25 @@
         h1 {
             color: #4A90E2;
             text-align: center;
+        }
+
+        /* Back Button Styling */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: gray;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #888;
         }
 
         .dashboard {
@@ -53,25 +71,25 @@
 
         /* Modal Styles */
         .modal {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
-            z-index: 1; /* Sit on top */
+            z-index: 1;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.4); /* Black with opacity */
-            overflow: auto; /* Enable scrolling if needed */
+            background-color: rgba(0, 0, 0, 0.4);
+            overflow: auto;
         }
 
         .modal-content {
             background-color: white;
-            margin: 10% auto; /* Center the modal vertically and horizontally */
+            margin: 10% auto;
             padding: 30px;
             border-radius: 8px;
             border: 1px solid #ddd;
-            width: 60%; /* Adjust the width as needed */
-            max-width: 800px; /* Set a maximum width */
+            width: 60%;
+            max-width: 800px;
         }
 
         .close {
@@ -86,11 +104,9 @@
         .close:focus {
             color: black;
             text-decoration: none;
-            cursor: pointer;
         }
 
-        /* Form Styles */
-        .form-input, .form-button, .position-input {
+        .form-input, .form-button {
             padding: 10px;
             margin: 10px 0;
             width: 100%;
@@ -104,7 +120,6 @@
             color: white;
             border: none;
             cursor: pointer;
-            font-size: 1.2rem;
         }
 
         .form-button:hover {
@@ -114,13 +129,12 @@
         .position-container {
             margin-bottom: 20px;
         }
-
     </style>
 </head>
 <body>
 
     <div class="container">
-
+        <button class="back-button" onclick="window.history.back()">Back</button>
         <h1>Application Dashboard</h1>
 
         <!-- Dashboard Buttons -->
@@ -137,12 +151,19 @@
                 <form action="{{ url_for('application') }}" method="POST">
                     <label for="position">Select Position:</label>
                     <select class="form-input" name="position" id="position" required>
-                        <option value="">Choose a position</option>
-                        <option value="president">President</option>
-                        <option value="vice_president">Vice President</option>
-                        <option value="secretary">Secretary</option>
-                        <option value="treasurer">Treasurer</option>
-                        <option value="pro">PRO</option>
+                        <option value="President">President</option>
+                        <option value="Vice President">Vice President</option>
+                        <option value="Secretary">Secretary</option>
+                        <option value="Treasurer">Treasurer</option>
+                        <option value="Auditor">Auditor</option>
+                        <option value="P.O">P.O</option>
+                        <option value="P.I.O">P.I.O</option>
+                        <option value="G-7 Rep">G-7 Rep</option>
+                        <option value="G-8 Rep">G-8 Rep</option>
+                        <option value="G-9 Rep">G-9 Rep</option>
+                        <option value="G-10 Rep">G-10 Rep</option>
+                        <option value="G-11 Rep">G-11 Rep</option>
+                        <option value="G-12 Rep">G-12 Rep</option>
                     </select>
 
                     <label for="lrn">Enter Your LRN:</label>
@@ -159,83 +180,112 @@
                 <span class="close" id="partyClose">&times;</span>
                 <h1>Create Party List</h1>
                 <form action="{{ url_for('application') }}" method="POST">
-                    <!-- Hidden field to indicate it's a party list application -->
                     <input type="hidden" name="is_party" value="True">
-                    
+
                     <label for="party_name">Party List Name:</label>
                     <input class="form-input" type="text" name="party_name" id="party_name" placeholder="Enter party list name" required>
 
-                    <!-- Add the LRN field for Party List -->
                     <label for="lrn">Enter Your LRN:</label>
-                    <input class="form-input" type="text" name="lrn" id="lrn" placeholder="Enter your LRN" required pattern="\d+" title="LRN must be a valid number">
-                
+                    <input class="form-input" type="text" name="lrn" id="lrn_party" placeholder="Enter your LRN" required pattern="\d+" title="LRN must be a valid number">
+
                     <div class="position-container">
                         <label for="president">President (LRN):</label>
                         <input class="form-input" type="text" name="president" id="president" placeholder="Enter LRN for President" required pattern="\d+" title="LRN must be a valid number">
                     </div>
-                
+
                     <div class="position-container">
                         <label for="vice_president">Vice President (LRN):</label>
                         <input class="form-input" type="text" name="vice_president" id="vice_president" placeholder="Enter LRN for Vice President" required pattern="\d+" title="LRN must be a valid number">
                     </div>
-                
+
                     <div class="position-container">
                         <label for="secretary">Secretary (LRN):</label>
                         <input class="form-input" type="text" name="secretary" id="secretary" placeholder="Enter LRN for Secretary" required pattern="\d+" title="LRN must be a valid number">
                     </div>
-                
+
                     <div class="position-container">
                         <label for="treasurer">Treasurer (LRN):</label>
                         <input class="form-input" type="text" name="treasurer" id="treasurer" placeholder="Enter LRN for Treasurer" required pattern="\d+" title="LRN must be a valid number">
                     </div>
-                
+
                     <div class="position-container">
-                        <label for="pro">PRO (LRN):</label>
-                        <input class="form-input" type="text" name="pro" id="pro" placeholder="Enter LRN for PRO" required pattern="\d+" title="LRN must be a valid number">
+                        <label for="auditor">Auditor (LRN):</label>
+                        <input class="form-input" type="text" name="auditor" id="auditor" placeholder="Enter LRN for Auditor" required pattern="\d+" title="LRN must be a valid number">
                     </div>
-                
+
+                    <div class="position-container">
+                        <label for="po">P.O (LRN):</label>
+                        <input class="form-input" type="text" name="po" id="po" placeholder="Enter LRN for P.O" required pattern="\d+" title="LRN must be a valid number">
+                    </div>
+
+                    <div class="position-container">
+                        <label for="pio">P.I.O (LRN):</label>
+                        <input class="form-input" type="text" name="pio" id="pio" placeholder="Enter LRN for P.I.O" required pattern="\d+" title="LRN must be a valid number">
+                    </div>
+
+                    <div class="position-container">
+                        <label for="g7_rep">G-7 Representative (LRN):</label>
+                        <input class="form-input" type="text" name="g7_rep" id="g7_rep" placeholder="Enter LRN for G-7 Rep" required pattern="\d+" title="LRN must be a valid number">
+                    </div>
+
+                    <div class="position-container">
+                        <label for="g8_rep">G-8 Representative (LRN):</label>
+                        <input class="form-input" type="text" name="g8_rep" id="g8_rep" placeholder="Enter LRN for G-8 Rep" required pattern="\d+" title="LRN must be a valid number">
+                    </div>
+
+                    <div class="position-container">
+                        <label for="g9_rep">G-9 Representative (LRN):</label>
+                        <input class="form-input" type="text" name="g9_rep" id="g9_rep" placeholder="Enter LRN for G-9 Rep" required pattern="\d+" title="LRN must be a valid number">
+                    </div>
+
+                    <div class="position-container">
+                        <label for="g10_rep">G-10 Representative (LRN):</label>
+                        <input class="form-input" type="text" name="g10_rep" id="g10_rep" placeholder="Enter LRN for G-10 Rep" required pattern="\d+" title="LRN must be a valid number">
+                    </div>
+
+                    <div class="position-container">
+                        <label for="g11_rep">G-11 Representative (LRN):</label>
+                        <input class="form-input" type="text" name="g11_rep" id="g11_rep" placeholder="Enter LRN for G-11 Rep" required pattern="\d+" title="LRN must be a valid number">
+                    </div>
+
+                    <div class="position-container">
+                        <label for="g12_rep">G-12 Representative (LRN):</label>
+                        <input class="form-input" type="text" name="g12_rep" id="g12_rep" placeholder="Enter LRN for G-12 Rep" required pattern="\d+" title="LRN must be a valid number">
+                    </div>
+
                     <button class="form-button" type="submit">Submit Party List</button>
                 </form>
-                
             </div>
         </div>  
 
     </div>
 
     <script>
-        // Get the modal elements
         var soloModal = document.getElementById("soloModal");
         var partyModal = document.getElementById("partyModal");
 
-        // Get the button elements
         var soloButton = document.getElementById("soloButton");
         var partyButton = document.getElementById("partyButton");
 
-        // Get the close elements
         var soloClose = document.getElementById("soloClose");
         var partyClose = document.getElementById("partyClose");
 
-        // When the user clicks the "Solo Application" button, open the solo modal
         soloButton.onclick = function() {
             soloModal.style.display = "block";
         }
 
-        // When the user clicks the "Party List Submission" button, open the party modal
         partyButton.onclick = function() {
             partyModal.style.display = "block";
         }
 
-        // When the user clicks the close button for solo modal, close it
         soloClose.onclick = function() {
             soloModal.style.display = "none";
         }
 
-        // When the user clicks the close button for party modal, close it
         partyClose.onclick = function() {
             partyModal.style.display = "none";
         }
 
-        // Close the modal if the user clicks outside of it
         window.onclick = function(event) {
             if (event.target == soloModal) {
                 soloModal.style.display = "none";

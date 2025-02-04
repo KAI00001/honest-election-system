@@ -163,24 +163,20 @@ def admin_dashboard():
 def application():
     if request.method == 'POST':
         try:
-            # Debug: Print raw form data
             print("Raw Form Data:", request.form)
 
             # Get form fields
             position = request.form.get('position')  # For solo applications
-            is_party = request.form.get('is_party') == 'True'  # Boolean from checkbox
+            is_party = request.form.get('is_party') is not None  # Boolean from checkbox
             party_name = request.form.get('party_name') if is_party else None
             lrn = request.form.get('lrn')
 
-            # Debug: Log parsed data
             print(f"Position: {position}, Is Party: {is_party}, Party Name: {party_name}, LRN: {lrn}")
 
-            # Validate form inputs
             if not lrn or (not is_party and not position) or (is_party and not party_name):
                 flash("Please fill in all required fields.", "danger")
                 return redirect(url_for('application'))
 
-            # Establish database connection
             connection = create_connection()
             if connection is None:
                 flash("Database connection error. Please try again later.", "danger")
@@ -191,72 +187,78 @@ def application():
             # Validate the LRN
             cursor.execute("SELECT * FROM valid_lrns WHERE lrn = %s", (lrn,))
             valid_lrn = cursor.fetchone()
-
             if not valid_lrn:
                 flash("Invalid LRN. Please check your LRN and try again.", "danger")
                 return redirect(url_for('application'))
 
-            # Handle party or solo application
             if is_party:
-                # Validate that all required positions are filled
-                president_lrn = request.form.get('president')
-                vice_president_lrn = request.form.get('vice_president')
-                secretary_lrn = request.form.get('secretary')
-                treasurer_lrn = request.form.get('treasurer')
-                pro_lrn = request.form.get('pro')
+                required_positions = {
+                    'President': request.form.get('president'),
+                    'Vice President': request.form.get('vice_president'),
+                    'Secretary': request.form.get('secretary'),
+                    'Treasurer': request.form.get('treasurer'),
+                    'Auditor': request.form.get('auditor'),
+                    'P.O': request.form.get('po'),
+                    'P.I.O': request.form.get('pio'),
+                    'G-7 Rep': request.form.get('g7_rep'),
+                    'G-8 Rep': request.form.get('g8_rep'),
+                    'G-9 Rep': request.form.get('g9_rep'),
+                    'G-10 Rep': request.form.get('g10_rep'),
+                    'G-11 Rep': request.form.get('g11_rep'),
+                    'G-12 Rep': request.form.get('g12_rep')
+                }
 
-                # Check that no position is left blank
-                if not all([president_lrn, vice_president_lrn, secretary_lrn, treasurer_lrn, pro_lrn]):
+                # Check if all positions are filled
+                if None in required_positions.values():
                     flash("Please fill all positions for the party list.", "danger")
                     return redirect(url_for('application'))
 
-                # Validate each position LRN exists in the valid_lrns table
-                for position_lrn in [president_lrn, vice_president_lrn, secretary_lrn, treasurer_lrn, pro_lrn]:
+                # Validate LRNs for positions
+                for position_name, position_lrn in required_positions.items():
                     cursor.execute("SELECT * FROM valid_lrns WHERE lrn = %s", (position_lrn,))
                     if not cursor.fetchone():
-                        flash(f"Invalid LRN for position {position_lrn}. Please check the LRNs.", "danger")
+                        flash(f"Invalid LRN for position {position_name}. Please check the LRNs.", "danger")
                         return redirect(url_for('application'))
 
-                # Debug: Before inserting into party_lists
-                print(f"Inserting into party_lists: Party Name = {party_name}, President LRN = {president_lrn}, Vice President LRN = {vice_president_lrn}, ...")
-                
-                # Insert into party_lists table
+                # Check if party name is unique
+                cursor.execute("SELECT id FROM party_lists WHERE party_name = %s", (party_name,))
+                if cursor.fetchone():
+                    flash("Party name already exists. Choose another name.", "danger")
+                    return redirect(url_for('application'))
+
+                print(f"Inserting into party_lists: {party_name}, {required_positions}")
+
                 cursor.execute("""
-                    INSERT INTO party_lists (party_name, president_lrn, vice_president_lrn, secretary_lrn, treasurer_lrn, pro_lrn, status)
-                    VALUES (%s, %s, %s, %s, %s, %s, 'pending')
-                """, (party_name, president_lrn, vice_president_lrn, secretary_lrn, treasurer_lrn, pro_lrn))
+                    INSERT INTO party_lists 
+                    (party_name, president_lrn, vice_president_lrn, secretary_lrn, treasurer_lrn, 
+                    auditor_lrn, po_lrn, pio_lrn, g7_rep_lrn, g8_rep_lrn, g9_rep_lrn, g10_rep_lrn, g11_rep_lrn, g12_rep_lrn, status)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')
+                """, (party_name, *required_positions.values()))
                 connection.commit()
 
-                # Get the last inserted party_list_id
                 party_list_id = cursor.lastrowid
-
-                # Debug: After inserting into party_lists
                 print(f"Party list inserted successfully with ID: {party_list_id}")
 
-                # Debug: Before inserting into party_members
-                print("Inserting into party_members for each position...")
-                
-                # Insert into party_members table
-                for position_lrn, position_name in zip([president_lrn, vice_president_lrn, secretary_lrn, treasurer_lrn, pro_lrn],
-                                                       ['president', 'vice_president', 'secretary', 'treasurer', 'pro']):
+                for position_name, position_lrn in required_positions.items():
                     cursor.execute("""
                         INSERT INTO party_members (party_list_id, lrn, position)
                         VALUES (%s, %s, %s)
                     """, (party_list_id, position_lrn, position_name))
                 connection.commit()
 
-                # Debug: After inserting into party_members
                 print("Party members inserted successfully!")
 
             else:
-                # Insert into solo_applications table (position and lrn)
+                # Prevent duplicate solo applications
+                cursor.execute("SELECT id FROM solo_applications WHERE lrn = %s", (lrn,))
+                if cursor.fetchone():
+                    flash("You have already applied for a position.", "danger")
+                    return redirect(url_for('application'))
+
                 cursor.execute("INSERT INTO solo_applications (position, lrn) VALUES (%s, %s)", (position, lrn))
                 connection.commit()
-
-                # Debug: After inserting into solo_applications
                 print("Solo application inserted successfully!")
 
-            # Flash success message and redirect
             flash("Application submitted successfully.", "success")
             return redirect(url_for('application'))
 

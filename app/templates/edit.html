@@ -81,6 +81,28 @@
         .flash-message.success {
             background-color: #4CAF50; /* Green for success */
         }
+
+        /* Back button styling */
+.back-button {
+    display: inline-block;
+    width: 100%; /* Ensure same width as the submit button */
+    padding: 12px; /* Same padding as the submit button */
+    font-size: 1.1rem;
+    background-color: #808080; /* Gray color */
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-left: -10px; /* Adjust this value to move it left */
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.back-button:hover {
+    background-color: #606060; /* Darker gray on hover */
+    transform: scale(1.05);
+}
+
     </style>
 </head>
 <body>
@@ -106,6 +128,10 @@
             <input class="input-field" type="email" name="email" placeholder="Enter Email" required>
             <button class="submit-button" type="submit">Submit</button>
         </form>
+
+        <!-- Back to Index Button -->
+        <a href="{{ url_for('index') }}" class="back-button">Back to Index</a>
+
     </div>
 </body>
 </html>

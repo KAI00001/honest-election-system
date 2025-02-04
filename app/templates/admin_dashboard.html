@@ -111,9 +111,33 @@
         .request-buttons button.decline:hover {
             background-color: #c9302c;
         }
+
+        /* Style for Back Button */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: gray;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .back-button:hover {
+            background-color: #444;
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- Back Button -->
+    <a href="/home">
+        <button class="back-button">Back</button>
+    </a>
 
     <div class="container">
         <h1>Admin Dashboard</h1>
@@ -193,7 +217,15 @@
                         <th>Vice President</th>
                         <th>Secretary</th>
                         <th>Treasurer</th>
-                        <th>PRO</th>
+                        <th>Auditor</th>
+                        <th>P.O</th>
+                        <th>P.I.O</th>
+                        <th>G-7 Rep</th>
+                        <th>G-8 Rep</th>
+                        <th>G-9 Rep</th>
+                        <th>G-10 Rep</th>
+                        <th>G-11 Rep</th>
+                        <th>G-12 Rep</th>
                         <th>Actions</th>
                     </tr>
                     {% for party in party_list_requests %}
@@ -203,7 +235,15 @@
                             <td>{{ party.vice_president_lrn }}</td>
                             <td>{{ party.secretary_lrn }}</td>
                             <td>{{ party.treasurer_lrn }}</td>
-                            <td>{{ party.pro_lrn }}</td>
+                            <td>{{ party.auditor_lrn }}</td>
+                            <td>{{ party.po_lrn }}</td>
+                            <td>{{ party.pio_lrn }}</td>
+                            <td>{{ party.g7_rep_lrn }}</td>
+                            <td>{{ party.g8_rep_lrn }}</td>
+                            <td>{{ party.g9_rep_lrn }}</td>
+                            <td>{{ party.g10_rep_lrn }}</td>
+                            <td>{{ party.g11_rep_lrn }}</td>
+                            <td>{{ party.g12_rep_lrn }}</td>
                             <td>
                                 <div class="request-buttons">
                                     <form action="/admin-dashboard" method="POST" style="display:inline;">
