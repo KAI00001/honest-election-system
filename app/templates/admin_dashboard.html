@@ -1,133 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <meta charset="UTF-8"> <!-- Specifies character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures responsive layout -->
+    <title>Admin Dashboard</title> <!-- Title of the page displayed in browser tab -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            color: #333;
+            font-family: Arial, sans-serif; /* Sets font for the body */
+            background-color: #f4f4f9; /* Sets background color for the page */
+            margin: 0; /* Removes default margin */
+            padding: 0; /* Removes default padding */
+            color: #333; /* Sets text color */
         }
 
         .container {
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
+            max-width: 1200px; /* Sets max width of content */
+            margin: auto; /* Centers the container */
+            padding: 20px; /* Adds padding around the container */
         }
 
         h1, h2 {
-            color: #4A90E2;
+            color: #4A90E2; /* Sets color for header text */
         }
 
         .box {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background-color: white;
+            border: 1px solid #ddd; /* Adds a light border around boxes */
+            border-radius: 8px; /* Rounds the corners of the box */
+            padding: 20px; /* Adds padding inside the box */
+            margin-bottom: 20px; /* Adds margin below the box */
+            background-color: white; /* Sets background color of the box */
         }
 
         .top-box-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
+            display: flex; /* Uses flexbox for layout */
+            justify-content: space-between; /* Distributes space between items */
+            gap: 20px; /* Adds space between items */
         }
 
         .top-box-container .box {
-            width: 48%;
+            width: 48%; /* Sets width of the box to 48% */
         }
 
         .form-input, .button {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
+            padding: 10px; /* Adds padding inside input and button */
+            margin: 10px 0; /* Adds margin above and below input and button */
+            border-radius: 5px; /* Rounds corners of inputs and buttons */
+            border: 1px solid #ddd; /* Adds light border around inputs and buttons */
+            font-size: 1rem; /* Sets font size */
         }
 
         .button {
-            background-color: #4A90E2;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
+            background-color: #4A90E2; /* Sets background color for button */
+            color: white; /* Sets text color to white */
+            border: none; /* Removes border from button */
+            cursor: pointer; /* Changes cursor to pointer on hover */
+            font-size: 1.2rem; /* Sets font size for the button */
         }
 
         .button:hover {
-            background-color: #357ABD;
+            background-color: #357ABD; /* Changes background color on hover */
         }
 
         table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
+            width: 100%; /* Sets table width to fill container */
+            margin-top: 20px; /* Adds margin above the table */
+            border-collapse: collapse; /* Ensures table borders collapse */
         }
 
         th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            padding: 10px; /* Adds padding inside table cells */
+            text-align: left; /* Aligns text to the left */
+            border-bottom: 1px solid #ddd; /* Adds a border at the bottom of each row */
         }
 
         th {
-            background-color: #f4f4f9;
+            background-color: #f4f4f9; /* Sets background color for table headers */
         }
 
         .flash-message {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            border: 1px solid #c3e6cb;
+            background-color: #d4edda; /* Sets background color for flash messages */
+            color: #155724; /* Sets text color for flash messages */
+            padding: 10px; /* Adds padding inside the flash message box */
+            margin-bottom: 20px; /* Adds margin below the flash message box */
+            border-radius: 5px; /* Rounds corners of flash message */
+            border: 1px solid #c3e6cb; /* Adds border around flash message */
         }
 
         .request-buttons button {
-            padding: 6px 12px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            padding: 6px 12px; /* Adds padding inside buttons */
+            margin: 5px; /* Adds margin around buttons */
+            border: none; /* Removes border from buttons */
+            border-radius: 5px; /* Rounds corners of buttons */
+            cursor: pointer; /* Changes cursor to pointer on hover */
         }
 
         .request-buttons button.approve {
-            background-color: #5cb85c; /* Green */
-            color: white;
+            background-color: #5cb85c; /* Sets background color for approve button (green) */
+            color: white; /* Sets text color to white */
         }
 
         .request-buttons button.approve:hover {
-            background-color: #4cae4c;
+            background-color: #4cae4c; /* Changes background color on hover */
         }
 
         .request-buttons button.decline {
-            background-color: #d9534f; /* Red */
-            color: white;
+            background-color: #d9534f; /* Sets background color for decline button (red) */
+            color: white; /* Sets text color to white */
         }
 
         .request-buttons button.decline:hover {
-            background-color: #c9302c;
+            background-color: #c9302c; /* Changes background color on hover */
         }
 
-        /* Style for Back Button */
         .back-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: gray;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 5px;
+            position: absolute; /* Positions the button absolutely on the page */
+            top: 20px; /* Positions button 20px from the top */
+            right: 20px; /* Positions button 20px from the right */
+            background-color: gray; /* Sets background color for the button */
+            color: white; /* Sets text color to white */
+            border: none; /* Removes border from button */
+            padding: 10px 15px; /* Adds padding inside the button */
+            font-size: 1rem; /* Sets font size for button */
+            cursor: pointer; /* Changes cursor to pointer on hover */
+            border-radius: 5px; /* Rounds corners of the button */
         }
 
         .back-button:hover {
-            background-color: #444;
+            background-color: #444; /* Changes background color on hover */
         }
 
     </style>
@@ -135,20 +134,20 @@
 <body>
 
     <!-- Back Button -->
-    <a href="/home">
-        <button class="back-button">Back</button>
+    <a href="/home"> <!-- Link to go back to home page -->
+        <button class="back-button">Back</button> <!-- Button to go back -->
     </a>
 
     <div class="container">
-        <h1>Admin Dashboard</h1>
+        <h1>Admin Dashboard</h1> <!-- Header for the admin dashboard -->
 
         <!-- Flash Message Section -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
+        {% with messages = get_flashed_messages(with_categories=true) %} <!-- Checks for flash messages -->
+            {% if messages %} <!-- If there are any messages -->
                 <div>
-                    {% for category, message in messages %}
-                        <div class="flash-message {{ category }}">
-                            {{ message }}
+                    {% for category, message in messages %} <!-- Loop through each message -->
+                        <div class="flash-message {{ category }}"> <!-- Display message with category as class -->
+                            {{ message }} <!-- Output the message text -->
                         </div>
                     {% endfor %}
                 </div>
@@ -158,49 +157,49 @@
         <div class="top-box-container">
             <!-- Box for Results of the Votes -->
             <div class="box">
-                <h2>Results of the Votes</h2>
-                {% if vote_results %}
-                    <table class="results-table">
+                <h2>Results of the Votes</h2> <!-- Title for the vote results box -->
+                {% if vote_results %} <!-- If there are any vote results -->
+                    <table class="results-table"> <!-- Table for vote results -->
                         <tr>
-                            <th>Party Name</th>
-                            <th>Total Votes</th>
+                            <th>Party Name</th> <!-- Table header for Party Name -->
+                            <th>Total Votes</th> <!-- Table header for Total Votes -->
                         </tr>
-                        {% for result in vote_results %}
+                        {% for result in vote_results %} <!-- Loop through each vote result -->
                             <tr>
-                                <td>{{ result.party_name }}</td>
-                                <td>{{ result.total_votes }}</td>
+                                <td>{{ result.party_name }}</td> <!-- Display party name -->
+                                <td>{{ result.total_votes }}</td> <!-- Display total votes -->
                             </tr>
                         {% endfor %}
                     </table>
-                {% else %}
-                    <p>No voting results available at the moment.</p>
+                {% else %} <!-- If no vote results -->
+                    <p>No voting results available at the moment.</p> <!-- Message for no results -->
                 {% endif %}
             </div>
 
             <!-- Box for Adding Valid LRN -->
             <div class="box">
-                <h2>Add Valid LRN</h2>
-                <form action="/admin-dashboard" method="POST">
-                    <input class="form-input" type="text" name="new_lrn" placeholder="Enter new LRN to add" required>
-                    <button class="button" type="submit">Add LRN</button>
+                <h2>Add Valid LRN</h2> <!-- Title for the Add LRN box -->
+                <form action="/admin-dashboard" method="POST"> <!-- Form to add new LRN -->
+                    <input class="form-input" type="text" name="new_lrn" placeholder="Enter new LRN to add" required> <!-- Input field for LRN -->
+                    <button class="button" type="submit">Add LRN</button> <!-- Submit button to add LRN -->
                 </form>
             </div>
         </div>
 
         <!-- Box for Voter Credentials -->
         <div class="box">
-            <h2>Voter Credentials</h2>
-            <table>
+            <h2>Voter Credentials</h2> <!-- Title for the Voter Credentials box -->
+            <table> <!-- Table for displaying voter information -->
                 <tr>
-                    <th>LRN</th>
-                    <th>Name</th>
-                    <th>Email</th>
+                    <th>LRN</th> <!-- Table header for LRN -->
+                    <th>Name</th> <!-- Table header for Name -->
+                    <th>Email</th> <!-- Table header for Email -->
                 </tr>
-                {% for voter in voters %}
+                {% for voter in voters %} <!-- Loop through each voter -->
                     <tr>
-                        <td>{{ voter.lrn }}</td>
-                        <td>{{ voter.full_name }}</td>
-                        <td>{{ voter.email }}</td>
+                        <td>{{ voter.lrn }}</td> <!-- Display LRN -->
+                        <td>{{ voter.full_name }}</td> <!-- Display Name -->
+                        <td>{{ voter.email }}</td> <!-- Display Email -->
                     </tr>
                 {% endfor %}
             </table>
@@ -208,51 +207,51 @@
 
         <!-- Box for Pending Party Lists -->
         <div class="box">
-            <h2>Pending Party Lists Application</h2>
-            {% if party_list_requests %}
-                <table class="party-list-table">
+            <h2>Pending Party Lists Application</h2> <!-- Title for Pending Party Lists -->
+            {% if party_list_requests %} <!-- If there are any pending requests -->
+                <table class="party-list-table"> <!-- Table for party list applications -->
                     <tr>
-                        <th>Party Name</th>
-                        <th>President</th>
-                        <th>Vice President</th>
-                        <th>Secretary</th>
-                        <th>Treasurer</th>
-                        <th>Auditor</th>
-                        <th>P.O</th>
-                        <th>P.I.O</th>
-                        <th>G-7 Rep</th>
-                        <th>G-8 Rep</th>
-                        <th>G-9 Rep</th>
-                        <th>G-10 Rep</th>
-                        <th>G-11 Rep</th>
-                        <th>G-12 Rep</th>
-                        <th>Actions</th>
+                        <th>Party Name</th> <!-- Table header for Party Name -->
+                        <th>President</th> <!-- Table header for President -->
+                        <th>Vice President</th> <!-- Table header for Vice President -->
+                        <th>Secretary</th> <!-- Table header for Secretary -->
+                        <th>Treasurer</th> <!-- Table header for Treasurer -->
+                        <th>Auditor</th> <!-- Table header for Auditor -->
+                        <th>P.O</th> <!-- Table header for P.O -->
+                        <th>P.I.O</th> <!-- Table header for P.I.O -->
+                        <th>G-7 Rep</th> <!-- Table header for G-7 Rep -->
+                        <th>G-8 Rep</th> <!-- Table header for G-8 Rep -->
+                        <th>G-9 Rep</th> <!-- Table header for G-9 Rep -->
+                        <th>G-10 Rep</th> <!-- Table header for G-10 Rep -->
+                        <th>G-11 Rep</th> <!-- Table header for G-11 Rep -->
+                        <th>G-12 Rep</th> <!-- Table header for G-12 Rep -->
+                        <th>Actions</th> <!-- Table header for Actions -->
                     </tr>
-                    {% for party in party_list_requests %}
+                    {% for party in party_list_requests %} <!-- Loop through each party list request -->
                         <tr>
-                            <td>{{ party.party_name }}</td>
-                            <td>{{ party.president_lrn }}</td>
-                            <td>{{ party.vice_president_lrn }}</td>
-                            <td>{{ party.secretary_lrn }}</td>
-                            <td>{{ party.treasurer_lrn }}</td>
-                            <td>{{ party.auditor_lrn }}</td>
-                            <td>{{ party.po_lrn }}</td>
-                            <td>{{ party.pio_lrn }}</td>
-                            <td>{{ party.g7_rep_lrn }}</td>
-                            <td>{{ party.g8_rep_lrn }}</td>
-                            <td>{{ party.g9_rep_lrn }}</td>
-                            <td>{{ party.g10_rep_lrn }}</td>
-                            <td>{{ party.g11_rep_lrn }}</td>
-                            <td>{{ party.g12_rep_lrn }}</td>
+                            <td>{{ party.party_name }}</td> <!-- Display Party Name -->
+                            <td>{{ party.president_lrn }}</td> <!-- Display President LRN -->
+                            <td>{{ party.vice_president_lrn }}</td> <!-- Display Vice President LRN -->
+                            <td>{{ party.secretary_lrn }}</td> <!-- Display Secretary LRN -->
+                            <td>{{ party.treasurer_lrn }}</td> <!-- Display Treasurer LRN -->
+                            <td>{{ party.auditor_lrn }}</td> <!-- Display Auditor LRN -->
+                            <td>{{ party.po_lrn }}</td> <!-- Display P.O LRN -->
+                            <td>{{ party.pio_lrn }}</td> <!-- Display P.I.O LRN -->
+                            <td>{{ party.g7_rep_lrn }}</td> <!-- Display G-7 Rep LRN -->
+                            <td>{{ party.g8_rep_lrn }}</td> <!-- Display G-8 Rep LRN -->
+                            <td>{{ party.g9_rep_lrn }}</td> <!-- Display G-9 Rep LRN -->
+                            <td>{{ party.g10_rep_lrn }}</td> <!-- Display G-10 Rep LRN -->
+                            <td>{{ party.g11_rep_lrn }}</td> <!-- Display G-11 Rep LRN -->
+                            <td>{{ party.g12_rep_lrn }}</td> <!-- Display G-12 Rep LRN -->
                             <td>
                                 <div class="request-buttons">
-                                    <form action="/admin-dashboard" method="POST" style="display:inline;">
-                                        <input type="hidden" name="party_list_id" value="{{ party.id }}">
-                                        <button type="submit" class="approve" name="approve_party_list">Accept</button>
+                                    <form action="/admin-dashboard" method="POST" style="display:inline;"> <!-- Form for accepting party list -->
+                                        <input type="hidden" name="party_list_id" value="{{ party.id }}"> <!-- Hidden input for party list ID -->
+                                        <button type="submit" class="approve" name="approve_party_list">Accept</button> <!-- Accept button -->
                                     </form>
-                                    <form action="/admin-dashboard" method="POST" style="display:inline;">
-                                        <input type="hidden" name="party_list_id" value="{{ party.id }}">
-                                        <button type="submit" class="decline" name="decline_party_list">Decline</button>
+                                    <form action="/admin-dashboard" method="POST" style="display:inline;"> <!-- Form for declining party list -->
+                                        <input type="hidden" name="party_list_id" value="{{ party.id }}"> <!-- Hidden input for party list ID -->
+                                        <button type="submit" class="decline" name="decline_party_list">Decline</button> <!-- Decline button -->
                                     </form>
                                 </div>
                             </td>
@@ -260,37 +259,35 @@
                     {% endfor %}
                 </table>
             {% else %}
-                <p>No pending party list requests at the moment.</p>
+                <p>No pending party list requests at the moment.</p> <!-- Message for no pending requests -->
             {% endif %}
         </div>
 
         <!-- Box for Pending Solo Applications -->
         <div class="box">
-            <h2>Pending Solo Applications</h2>
-            {% if solo_applications %}
-                <ul>
-                    {% for application in solo_applications %}
+            <h2>Pending Solo Applications</h2> <!-- Title for Pending Solo Applications -->
+            {% if solo_applications %} <!-- If there are any pending solo applications -->
+                <ul> <!-- List for solo applications -->
+                    {% for application in solo_applications %} <!-- Loop through each solo application -->
                         <li>
-                            <strong>{{ application.position }}</strong> - {{ application.lrn }}
+                            <strong>{{ application.position }}</strong> - {{ application.lrn }} <!-- Display position and LRN -->
                             <div class="request-buttons">
-                                <form action="/admin-dashboard" method="POST" style="display:inline;">
-                                    <input type="hidden" name="application_id" value="{{ application.id }}">
-                                    <button type="submit" class="approve" name="approve_solo_application">Accept</button>
+                                <form action="/admin-dashboard" method="POST" style="display:inline;"> <!-- Form for accepting solo application -->
+                                    <input type="hidden" name="solo_application_id" value="{{ application.id }}"> <!-- Hidden input for application ID -->
+                                    <button type="submit" class="approve" name="approve_solo_application">Accept</button> <!-- Accept button -->
                                 </form>
-                                <form action="/admin-dashboard" method="POST" style="display:inline;">
-                                    <input type="hidden" name="application_id" value="{{ application.id }}">
-                                    <button type="submit" class="decline" name="decline_solo_application">Decline</button>
+                                <form action="/admin-dashboard" method="POST" style="display:inline;"> <!-- Form for declining solo application -->
+                                    <input type="hidden" name="solo_application_id" value="{{ application.id }}"> <!-- Hidden input for application ID -->
+                                    <button type="submit" class="decline" name="decline_solo_application">Decline</button> <!-- Decline button -->
                                 </form>
                             </div>
                         </li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <p>No pending solo applications at the moment.</p>
+                <p>No pending solo applications at the moment.</p> <!-- Message for no pending applications -->
             {% endif %}
         </div>
-
     </div>
-
 </body>
 </html>

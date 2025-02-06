@@ -1,54 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Election Web Application</title>
+    <meta charset="UTF-8"> <!-- Character encoding for the page -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive design for mobile devices -->
+    <title>Election Web Application</title> <!-- Title displayed on the browser tab -->
     <style>
         /* Body styling */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Arial', sans-serif; /* Set font for the page */
             background: linear-gradient(135deg, #A7C7E7, #6495ED); /* Lighter blue gradient background */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            display: flex; /* Use flexbox for layout */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            height: 100vh; /* Full viewport height */
+            text-align: center; /* Center text */
         }
 
         /* Container styling */
         .container {
-            width: 100%;
-            max-width: 800px; /* Increased container width */
+            width: 100%; /* Full width of the container */
+            max-width: 800px; /* Maximum width for container */
             padding: 60px; /* Increased padding for a more spacious feel */
-            background-color: #ffffff;
-            border-radius: 15px; /* Slightly more rounded corners */
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* More refined shadow */
-            text-align: center;
+            background-color: #ffffff; /* White background for the container */
+            border-radius: 15px; /* Rounded corners for the container */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Soft shadow around the container */
+            text-align: center; /* Center text inside the container */
         }
 
         h1 {
-            margin-bottom: 60px; /* Increased margin for better spacing */
-            font-size: 3rem; /* Larger heading */
-            color: #4169E1; /* Royal blue for the header */
-            font-weight: 700; /* Bold header */
+            margin-bottom: 60px; /* Increased margin below the heading for better spacing */
+            font-size: 3rem; /* Larger font size for the header */
+            color: #4169E1; /* Royal blue for the header color */
+            font-weight: 700; /* Bold font weight for the header */
         }
 
         /* Button styling */
         .button {
-            display: block;
+            display: block; /* Make button a block element */
             width: 80%; /* Keep width to 80% */
             margin: 20px auto; /* Increase margin for spacing */
             padding: 20px; /* Increased padding for larger buttons */
-            font-size: 1.6rem; /* Larger font size */
-            background-color: #4169E1; /* Royal blue background */
-            color: white;
-            border: none;
-            border-radius: 10px; /* Rounded corners */
-            cursor: pointer;
-            transition: transform 0.3s, background-color 0.3s;
+            font-size: 1.6rem; /* Larger font size for the button */
+            background-color: #4169E1; /* Royal blue background for the button */
+            color: white; /* White text color */
+            border: none; /* Remove border */
+            border-radius: 10px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            transition: transform 0.3s, background-color 0.3s; /* Smooth transitions for hover effects */
             outline: none; /* Remove the blue outline */
             box-shadow: none; /* Remove the box-shadow that appears on focus */
         }
@@ -56,7 +56,7 @@
         /* Hover effect for buttons */
         .button:hover {
             background-color: #3B5A9B; /* Slightly darker royal blue on hover */
-            transform: scale(1.05); /* Slightly larger on hover */
+            transform: scale(1.05); /* Slightly enlarge the button on hover */
         }
 
         /* Remove outline on focus */
@@ -67,28 +67,28 @@
 
         /* Circular Edit Button */
         .edit-button {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background-color: #333333; /* Dark gray background */
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s, transform 0.3s;
+            position: fixed; /* Fixed position for the edit button */
+            top: 20px; /* Position 20px from the top */
+            right: 20px; /* Position 20px from the right */
+            width: 50px; /* Set button width */
+            height: 50px; /* Set button height */
+            background-color: #333333; /* Dark gray background for the button */
+            color: white; /* White text color */
+            font-size: 16px; /* Set font size */
+            font-weight: bold; /* Bold text */
+            border: none; /* Remove border */
+            border-radius: 50%; /* Circular button shape */
+            display: flex; /* Use flexbox for centering the content */
+            justify-content: center; /* Center the text horizontally */
+            align-items: center; /* Center the text vertically */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for the button */
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transitions on hover */
         }
 
         .edit-button:hover {
             background-color: #444444; /* Slightly lighter gray on hover */
-            transform: scale(1.1); /* Slightly enlarge on hover */
+            transform: scale(1.1); /* Slightly enlarge the button on hover */
         }
 
         /* Responsive layout for smaller screens */
@@ -107,9 +107,9 @@
             }
 
             .edit-button {
-                width: 40px;
-                height: 40px;
-                font-size: 14px;
+                width: 40px; /* Smaller width for the edit button */
+                height: 40px; /* Smaller height for the edit button */
+                font-size: 14px; /* Smaller font size */
             }
         }
 
@@ -117,19 +117,19 @@
 </head>
 <body>
     <!-- Circular Edit Button -->
-    <button class="edit-button" onclick="editFunction()">EDIT</button>
+    <button class="edit-button" onclick="editFunction()">EDIT</button> <!-- Edit button that triggers the edit function -->
 
     <div class="container">
-        <h1>Welcome to the Election Portal</h1>
+        <h1>Welcome to the Election Portal</h1> <!-- Main heading for the page -->
         
-        <a href="/voters">
-            <button class="button">Voters</button>
+        <a href="/voters"> <!-- Link to the voters page -->
+            <button class="button">Voters</button> <!-- Voters button -->
         </a>
-        <a href="/application">
-            <button class="button">Application</button>
+        <a href="/application"> <!-- Link to the application page -->
+            <button class="button">Application</button> <!-- Application button -->
         </a>
-        <a href="/admin">
-            <button class="button">Admin</button>
+        <a href="/admin"> <!-- Link to the admin page -->
+            <button class="button">Admin</button> <!-- Admin button -->
         </a>
     </div>
 

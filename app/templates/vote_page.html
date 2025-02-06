@@ -1,173 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vote</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <meta charset="UTF-8"> <!-- Sets character encoding to UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures proper scaling on mobile devices -->
+    <title>Vote</title> <!-- Sets the page title -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"> <!-- Links to Bootstrap CSS for styling -->
     <style>
-        .form-select {
-            color: #000 !important;
-            background-color: #fff !important;
-            border: 1px solid #ced4da;
-            height: 40px;
+        .form-select { /* Custom style for form select element */
+            color: #000 !important; /* Ensures text color is black */
+            background-color: #fff !important; /* Background color white */
+            border: 1px solid #ced4da; /* Border color */
+            height: 40px; /* Height of the select box */
         }
 
-        .form-select option {
-            color: #000 !important;
-            background-color: #fff !important;
-            font-size: 16px;
+        .form-select option { /* Custom style for select options */
+            color: #000 !important; /* Ensures text color is black */
+            background-color: #fff !important; /* Background color white */
+            font-size: 16px; /* Font size for options */
         }
 
-        .form-select:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+        .form-select:focus { /* Focus style for select element */
+            border-color: #007bff; /* Blue border on focus */
+            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25); /* Blue shadow on focus */
         }
 
-        .alert {
-            margin-top: 20px;
+        .alert { /* Style for alert messages */
+            margin-top: 20px; /* Adds space above the alert */
         }
 
-        .btn {
-            width: 100%;
+        .btn { /* Style for buttons */
+            width: 100%; /* Button takes up full width */
         }
 
-        .no-candidates {
-            color: red;
-            font-style: italic;
+        .no-candidates { /* Style for the "No candidates" message */
+            color: red; /* Red text color */
+            font-style: italic; /* Italic text */
         }
 
         /* Styling for back button */
         .back-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: #808080;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background-color 0.3s;
+            position: absolute; /* Absolute positioning */
+            top: 20px; /* 20px from the top */
+            right: 20px; /* 20px from the right */
+            background-color: #808080; /* Gray background */
+            color: white; /* White text */
+            padding: 10px 20px; /* Padding around the button */
+            border-radius: 5px; /* Rounded corners */
+            text-decoration: none; /* Removes underline */
+            transition: background-color 0.3s; /* Smooth transition for hover effect */
         }
 
-        .back-button:hover {
-            background-color: #606060;
+        .back-button:hover { /* Hover effect for back button */
+            background-color: #606060; /* Darker gray on hover */
         }
     </style>
 </head>
 <body>
-    <a href="{{ url_for('index') }}" class="back-button">Back</a>
+    <a href="{{ url_for('index') }}" class="back-button">Back</a> <!-- Link to go back to the main page -->
 
-    <div class="container mt-5">
-        <h1 class="text-center">Vote for Your Preferred Candidate</h1>
+    <div class="container mt-5"> <!-- Main container for the page content -->
+        <h1 class="text-center">Vote for Your Preferred Candidate</h1> <!-- Heading for the vote section -->
 
         <!-- Flash message for errors and success -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
+        {% with messages = get_flashed_messages(with_categories=true) %} <!-- Grabs flashed messages -->
+        {% if messages %} <!-- Checks if there are messages -->
+            {% for category, message in messages %} <!-- Loops through all messages -->
+                <div class="alert alert-{{ category }}"> <!-- Displays message with proper category styling -->
+                    {{ message }} <!-- Shows the message content -->
                 </div>
             {% endfor %}
         {% endif %}
         {% endwith %}
 
-        <form method="POST" action="/vote-page">
+        <!-- Voting form -->
+        <form method="POST" action="/vote-page"> <!-- POST form to submit votes -->
             <div class="mb-4">
-                <label for="position" class="form-label">Select Position</label>
-                <select class="form-select" id="position" name="position" required onchange="updateCandidates()">
-                    <option value="" disabled selected>Select a position</option>
-                    {% for position in positions %}
-                        <option value="{{ position.id }}" {% if position.id == request.form.get('position') %} selected {% endif %}>
-                            {{ position.name }}
+                <label for="position" class="form-label">Select Position</label> <!-- Label for position select box -->
+                <select class="form-select" id="position" name="position" required onchange="updateCandidates()"> <!-- Select box for positions, triggers candidate update -->
+                    <option value="" disabled selected>Select a position</option> <!-- Default prompt option -->
+                    {% for position in positions %} <!-- Loops through available positions -->
+                        <option value="{{ position.id }}" {% if position.id == request.form.get('position') %} selected {% endif %}> <!-- Sets the selected option if it matches -->
+                            {{ position.name }} <!-- Displays position name -->
                         </option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="mb-4">
-                <label for="candidate" class="form-label">Select Candidate</label>
-                <select class="form-select" id="candidate" name="candidate" required>
-                    <option value="" disabled selected>Select a candidate</option>
+                <label for="candidate" class="form-label">Select Candidate</label> <!-- Label for candidate select box -->
+                <select class="form-select" id="candidate" name="candidate" required> <!-- Select box for candidates -->
+                    <option value="" disabled selected>Select a candidate</option> <!-- Default prompt option -->
                 </select>
-                <div id="no-candidates" class="no-candidates mt-2 d-none">
+                <div id="no-candidates" class="no-candidates mt-2 d-none"> <!-- Hidden message for no candidates available -->
                     No candidates available for the selected position.
                 </div>
             </div>
 
-            <input type="hidden" id="candidate_type" name="candidate_type">
+            <input type="hidden" id="candidate_type" name="candidate_type"> <!-- Hidden input for candidate type -->
 
-            <button type="submit" class="btn btn-primary">Submit Vote</button>
+            <button type="submit" class="btn btn-primary">Submit Vote</button> <!-- Submit button for the vote -->
         </form>
 
-        <hr>
+        <hr> <!-- Horizontal line -->
 
-        <h2 class="mt-5">Ongoing Results</h2>
-        <table class="table table-bordered mt-3">
+        <h2 class="mt-5">Ongoing Results</h2> <!-- Heading for the results section -->
+        <table class="table table-bordered mt-3"> <!-- Table for displaying vote results -->
             <thead>
                 <tr>
-                    <th>Position</th>
-                    <th>Candidate</th>
-                    <th>Votes</th>
+                    <th>Position</th> <!-- Table header for position -->
+                    <th>Candidate</th> <!-- Table header for candidate -->
+                    <th>Votes</th> <!-- Table header for votes -->
                 </tr>
             </thead>
             <tbody>
-                {% for result in vote_results %}
+                {% for result in vote_results %} <!-- Loops through the vote results -->
                     <tr>
-                        <td>{{ result.position }}</td>
+                        <td>{{ result.position }}</td> <!-- Displays the position -->
                         <td>
-                            {% if result.type == 'party_member' %}
-                                {{ result.full_name }} ({{ result.party_name }})
+                            {% if result.type == 'party_member' %} <!-- Checks if the result is for a party member -->
+                                {{ result.full_name }} ({{ result.party_name }}) <!-- Displays full name and party name -->
                             {% else %}
-                                {{ result.full_name }}
+                                {{ result.full_name }} <!-- Displays full name for non-party members -->
                             {% endif %}
                         </td>
-                        <td>{{ result.votes }}</td>
+                        <td>{{ result.votes }}</td> <!-- Displays the number of votes -->
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>
+    </div> <!-- End of the container -->
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.min.js"></script>
-    <script>
-        function updateCandidates() {
-            const positionId = document.getElementById('position').value;
-            const candidateSelect = document.getElementById('candidate');
-            const noCandidatesMessage = document.getElementById('no-candidates');
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.min.js"></script> <!-- Bootstrap JS for additional functionality -->
 
-            // Reset candidate dropdown
-            candidateSelect.innerHTML = '<option value="" disabled selected>Select a candidate</option>';
-            noCandidatesMessage.classList.add('d-none');
+<script>
+    function updateCandidates() {  // Function to update the candidates based on the selected position
+        const positionId = document.getElementById('position').value;  // Get selected position ID
+        const candidateSelect = document.getElementById('candidate');  // Get the candidate select element
+        const noCandidatesMessage = document.getElementById('no-candidates');  // Get the "No candidates" message element
 
-            if (positionId) {
-                fetch(`/vote-page?position=${positionId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.candidates && data.candidates.length > 0) {
-                            data.candidates.forEach(candidate => {
-                                const option = document.createElement('option');
-                                option.value = candidate.id;
-                                option.textContent = candidate.name;
-                                option.dataset.type = candidate.type;
-                                candidateSelect.appendChild(option);
-                            });
-                        } else {
-                            noCandidatesMessage.classList.remove('d-none');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching candidates:', error);
-                        alert('Failed to fetch candidates. Please try again.');
-                    });
-            }
+        // Reset candidate dropdown
+        candidateSelect.innerHTML = '<option value="" disabled selected>Select a candidate</option>';  // Clear the candidate options
+        noCandidatesMessage.classList.add('d-none');  // Hide the "No candidates" message
+
+        if (positionId) {  // If a position is selected
+            // Fetch candidates for the selected position from the server
+            fetch(`/vote-page?position=${positionId}`)
+                .then(response => response.json())  // Parse the response as JSON
+                .then(data => {
+                    if (data.candidates && data.candidates.length > 0) {  // If there are candidates for the position
+                        data.candidates.forEach(candidate => {  // Loop through each candidate
+                            const option = document.createElement('option');  // Create a new option element
+                            option.value = candidate.id;  // Set the candidate ID as the value
+                            option.textContent = candidate.name;  // Set the candidate name as the option text
+                            option.dataset.type = candidate.type;  // Store the candidate type in a data attribute
+                            candidateSelect.appendChild(option);  // Append the option to the candidate dropdown
+                        });
+                    } else {  // If no candidates are available
+                        noCandidatesMessage.classList.remove('d-none');  // Show the "No candidates" message
+                    }
+                })
+                .catch(error => {  // If there is an error fetching candidates
+                    console.error('Error fetching candidates:', error);  // Log the error to the console
+                    alert('Failed to fetch candidates. Please try again.');  // Alert the user about the error
+                });
         }
+    }
 
-        document.getElementById('candidate').addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            const candidateType = selectedOption.dataset.type;
-            document.getElementById('candidate_type').value = candidateType;
-        });
-    </script>
+    // Add event listener to update candidate type when a candidate is selected
+    document.getElementById('candidate').addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];  // Get the selected option
+        const candidateType = selectedOption.dataset.type;  // Get the candidate type from the data attribute
+        document.getElementById('candidate_type').value = candidateType;  // Set the candidate type in the hidden input
+    });
+</script>
 </body>
 </html>

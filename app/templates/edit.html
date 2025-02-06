@@ -1,77 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit LRN</title>
+    <meta charset="UTF-8"> <!-- Character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- For responsive design -->
+    <title>Edit LRN</title> <!-- Page title displayed on browser tab -->
     <style>
         /* Global body styling */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Arial', sans-serif; /* Setting font family */
             background: linear-gradient(135deg, #2196F3, #64B5F6); /* Blue gradient */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            display: flex; /* Use flexbox for centering */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            height: 100vh; /* Full viewport height */
         }
 
         /* Form container styling */
         .form-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 40px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            width: 100%; /* Full width */
+            max-width: 400px; /* Max width of 400px */
+            padding: 40px; /* Add padding inside the form */
+            background-color: #ffffff; /* White background */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            text-align: center; /* Center content inside form */
         }
 
         /* Heading styling */
         h1 {
-            margin-bottom: 20px;
-            font-size: 2rem;
+            margin-bottom: 20px; /* Margin below the heading */
+            font-size: 2rem; /* Font size of 2 rem */
             color: #2196F3; /* Blue color */
-            font-weight: bold;
+            font-weight: bold; /* Bold font weight */
         }
 
         /* Input field styling */
         .input-field {
-            width: 100%;
-            margin-bottom: 20px;
-            padding: 12px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
+            width: 100%; /* Full width of input */
+            margin-bottom: 20px; /* Space between inputs */
+            padding: 12px; /* Padding inside input */
+            font-size: 1rem; /* Font size */
+            border: 1px solid #ccc; /* Border color */
+            border-radius: 5px; /* Rounded corners */
+            box-sizing: border-box; /* Ensure padding is included in width calculation */
         }
 
         /* Submit button styling */
         .submit-button {
-            width: 100%;
-            padding: 12px;
-            font-size: 1.1rem;
+            width: 100%; /* Full width */
+            padding: 12px; /* Padding inside the button */
+            font-size: 1.1rem; /* Slightly larger font size */
             background-color: #2196F3; /* Matching blue */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
+            color: white; /* White text */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transition effects */
         }
 
         .submit-button:hover {
             background-color: #1976D2; /* Darker blue on hover */
-            transform: scale(1.05);
+            transform: scale(1.05); /* Slight scale effect on hover */
         }
 
         /* Flash messages styling */
         .flash-message {
-            color: white;
-            font-weight: bold;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+            color: white; /* White text */
+            font-weight: bold; /* Bold font weight */
+            padding: 10px; /* Padding around the message */
+            margin-bottom: 20px; /* Space below the message */
+            border-radius: 5px; /* Rounded corners */
         }
 
         .flash-message.danger {
@@ -83,25 +83,25 @@
         }
 
         /* Back button styling */
-.back-button {
-    display: inline-block;
-    width: 100%; /* Ensure same width as the submit button */
-    padding: 12px; /* Same padding as the submit button */
-    font-size: 1.1rem;
-    background-color: #808080; /* Gray color */
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-top: 10px;
-    margin-left: -10px; /* Adjust this value to move it left */
-    transition: background-color 0.3s, transform 0.3s;
-}
+        .back-button {
+            display: inline-block; /* Inline block to behave like a button */
+            width: 100%; /* Ensure same width as the submit button */
+            padding: 12px; /* Same padding as the submit button */
+            font-size: 1.1rem; /* Slightly larger font size */
+            background-color: #808080; /* Gray color */
+            color: white; /* White text */
+            text-align: center; /* Center text */
+            text-decoration: none; /* Remove underline */
+            border-radius: 5px; /* Rounded corners */
+            margin-top: 10px; /* Space above button */
+            margin-left: -10px; /* Adjust this value to move it left */
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transition effects */
+        }
 
-.back-button:hover {
-    background-color: #606060; /* Darker gray on hover */
-    transform: scale(1.05);
-}
+        .back-button:hover {
+            background-color: #606060; /* Darker gray on hover */
+            transform: scale(1.05); /* Slight scale effect on hover */
+        }
 
     </style>
 </head>
@@ -110,27 +110,27 @@
         <h1>Edit LRN</h1>
         
         <!-- Flash message for errors or success -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <ul>
-            {% for category, message in messages %}
-                <li class="flash-message {{ category }}">{{ message }}</li>
+        {% with messages = get_flashed_messages(with_categories=true) %} <!-- Get flashed messages with categories -->
+        {% if messages %} <!-- If messages exist -->
+            <ul> <!-- Start list of messages -->
+            {% for category, message in messages %} <!-- Loop through each message -->
+                <li class="flash-message {{ category }}">{{ message }}</li> <!-- Display each message with category-specific styling -->
             {% endfor %}
-            </ul>
+            </ul> <!-- End list -->
         {% endif %}
         {% endwith %}
 
         <!-- Form for editing LRN -->
-        <form action="/edit-page" method="POST">
-            <input class="input-field" type="text" name="lrn" placeholder="Enter LRN" required>
-            <input class="input-field" type="password" name="password" placeholder="Enter Password" required>
-            <input class="input-field" type="text" name="full_name" placeholder="Enter Full Name" required>
-            <input class="input-field" type="email" name="email" placeholder="Enter Email" required>
-            <button class="submit-button" type="submit">Submit</button>
+        <form action="/edit-page" method="POST"> <!-- Form submission to '/edit-page' -->
+            <input class="input-field" type="text" name="lrn" placeholder="Enter LRN" required> <!-- LRN input field -->
+            <input class="input-field" type="password" name="password" placeholder="Enter Password" required> <!-- Password input field -->
+            <input class="input-field" type="text" name="full_name" placeholder="Enter Full Name" required> <!-- Full Name input field -->
+            <input class="input-field" type="email" name="email" placeholder="Enter Email" required> <!-- Email input field -->
+            <button class="submit-button" type="submit">Submit</button> <!-- Submit button -->
         </form>
 
         <!-- Back to Index Button -->
-        <a href="{{ url_for('index') }}" class="back-button">Back to Index</a>
+        <a href="{{ url_for('index') }}" class="back-button">Back to Index</a> <!-- Link to go back to the index page -->
 
     </div>
 </body>

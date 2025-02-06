@@ -1,76 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Details</title>
+    <meta charset="UTF-8"> <!-- Sets the character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures proper scaling on different devices -->
+    <title>Register Details</title> <!-- Sets the title of the page -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            font-family: Arial, sans-serif; /* Sets the font for the page */
+            background-color: #f4f4f9; /* Sets a light background color */
+            display: flex; /* Uses flexbox for layout */
+            justify-content: center; /* Centers the content horizontally */
+            align-items: center; /* Centers the content vertically */
+            height: 100vh; /* Sets the height of the page to fill the viewport */
+            margin: 0; /* Removes default margin */
         }
 
         .container {
-            max-width: 400px;
-            width: 100%;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            text-align: center;
+            max-width: 400px; /* Limits the maximum width of the form container */
+            width: 100%; /* Makes the container width responsive */
+            padding: 20px; /* Adds padding inside the container */
+            background-color: #fff; /* Sets a white background for the form */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for better visibility */
+            border-radius: 8px; /* Rounds the corners of the container */
+            text-align: center; /* Centers the content inside the container */
         }
 
         .container h2 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #333;
+            margin-bottom: 20px; /* Adds space below the heading */
+            font-size: 24px; /* Sets the font size for the heading */
+            color: #333; /* Sets a dark color for the heading */
         }
 
         .form-group {
-            margin-bottom: 15px;
-            text-align: left;
+            margin-bottom: 15px; /* Adds space between form groups */
+            text-align: left; /* Aligns the form inputs to the left */
         }
 
         .form-control {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
+            width: 100%; /* Makes input fields take the full width */
+            padding: 10px; /* Adds padding inside the input fields */
+            border: 1px solid #ccc; /* Adds a light border around the input fields */
+            border-radius: 4px; /* Rounds the corners of the input fields */
+            font-size: 16px; /* Sets the font size for input fields */
         }
 
         .btn {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
+            background-color: #007bff; /* Sets a blue background color for the button */
+            color: white; /* Sets the text color to white */
+            padding: 10px 15px; /* Adds padding inside the button */
+            border: none; /* Removes the border */
+            border-radius: 4px; /* Rounds the corners of the button */
+            cursor: pointer; /* Changes the cursor to a pointer on hover */
+            width: 100%; /* Makes the button take the full width of its container */
+            font-size: 16px; /* Sets the font size for the button */
         }
 
         .btn:hover {
-            background-color: #0056b3;
+            background-color: #0056b3; /* Changes the background color when hovering */
         }
 
         .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 10px;
-            height: 20px;
+            color: red; /* Sets the color of error messages to red */
+            font-size: 14px; /* Sets the font size for error messages */
+            margin-top: 10px; /* Adds space above the error message */
+            height: 20px; /* Sets a fixed height to avoid layout shifts */
         }
 
         .flash-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 10px;
-            height: 20px;
+            color: red; /* Sets the color of flash messages to red */
+            font-size: 14px; /* Sets the font size for flash messages */
+            margin-top: 10px; /* Adds space above the flash message */
+            height: 20px; /* Sets a fixed height for the flash message */
         }
     </style>
 </head>
@@ -83,64 +83,78 @@
         {% if messages %}
             <div class="flash-message">
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }}">{{ message }}</div> <!-- Loops through and displays flash messages -->
                 {% endfor %}
             </div>
         {% endif %}
         {% endwith %}
 
-        <form id="registerForm" action="/edit-page" method="POST">
+        <!-- Registration Form -->
+        <form id="registerForm" action="/edit-page" method="POST"> <!-- Form sends data to /edit-page -->
             <div class="form-group">
                 <input type="text" id="lrn" name="lrn" class="form-control" 
                        placeholder="Enter LRN" required 
-                       pattern="\d+" title="LRN must be a valid number">
+                       pattern="\d+" title="LRN must be a valid number"> <!-- LRN input, must be a number -->
             </div>
             <div class="form-group">
                 <input type="password" id="password" name="password" class="form-control" 
-                       placeholder="Enter Password" required>
+                       placeholder="Enter Password" required> <!-- Password input -->
             </div>
             <div class="form-group">
                 <input type="text" id="full_name" name="full_name" class="form-control" 
-                       placeholder="Enter Full Name" required>
+                       placeholder="Enter Full Name" required> <!-- Full Name input -->
             </div>
             <div class="form-group">
                 <input type="email" id="email" name="email" class="form-control" 
-                       placeholder="Enter Email" required>
+                       placeholder="Enter Email" required> <!-- Email input -->
             </div>
-            <button type="submit" class="btn">Register</button>
-            <div id="error-message" class="error-message" aria-live="polite"></div>
+            <button type="submit" class="btn">Register</button> <!-- Submit button -->
+            <div id="error-message" class="error-message" aria-live="polite"></div> <!-- Error message container -->
         </form>
     </div>
 
     <script>
-        document.getElementById('registerForm').addEventListener('submit', function (e) {
-            const lrnField = document.getElementById('lrn');
-            const passwordField = document.getElementById('password');
-            const fullNameField = document.getElementById('full_name');
-            const emailField = document.getElementById('email');
-            const errorMessage = document.getElementById('error-message');
-
+        document.getElementById('registerForm').addEventListener('submit', function (e) { 
+            // Add event listener to the form for when it's submitted
+            const lrnField = document.getElementById('lrn'); 
+            const passwordField = document.getElementById('password'); 
+            const fullNameField = document.getElementById('full_name'); 
+            const emailField = document.getElementById('email'); 
+            const errorMessage = document.getElementById('error-message'); 
+    
+            // Check if the LRN field is empty
             if (lrnField.value.trim() === '') {
-                e.preventDefault();
-                errorMessage.textContent = "LRN cannot be empty.";
-            } else if (!/^\d+$/.test(lrnField.value)) {
-                e.preventDefault();
-                errorMessage.textContent = "LRN must be a valid number.";
-            } else if (passwordField.value.trim() === '') {
-                e.preventDefault();
-                errorMessage.textContent = "Password cannot be empty.";
-            } else if (fullNameField.value.trim() === '') {
-                e.preventDefault();
-                errorMessage.textContent = "Full Name cannot be empty.";
-            } else if (emailField.value.trim() === '' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value)) {
-                e.preventDefault();
-                errorMessage.textContent = "Email must be a valid email address.";
-            } else {
-                errorMessage.textContent = '';
-                const submitButton = this.querySelector('button[type="submit"]');
-                submitButton.disabled = true;
+                e.preventDefault(); // Prevent form submission
+                errorMessage.textContent = "LRN cannot be empty."; // Display error message
+            } 
+            // Validate if the LRN is a valid number
+            else if (!/^\d+$/.test(lrnField.value)) {
+                e.preventDefault(); // Prevent form submission
+                errorMessage.textContent = "LRN must be a valid number."; // Display error message
+            } 
+            // Check if the password field is empty
+            else if (passwordField.value.trim() === '') {
+                e.preventDefault(); // Prevent form submission
+                errorMessage.textContent = "Password cannot be empty."; // Display error message
+            } 
+            // Check if the full name field is empty
+            else if (fullNameField.value.trim() === '') {
+                e.preventDefault(); // Prevent form submission
+                errorMessage.textContent = "Full Name cannot be empty."; // Display error message
+            } 
+            // Check if the email field is empty or not a valid email
+            else if (emailField.value.trim() === '' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value)) {
+                e.preventDefault(); // Prevent form submission
+                errorMessage.textContent = "Email must be a valid email address."; // Display error message
+            } 
+            // If all fields are valid
+            else {
+                errorMessage.textContent = ''; // Clear any existing error messages
+                const submitButton = this.querySelector('button[type="submit"]'); 
+                submitButton.disabled = true; // Disable the submit button to prevent multiple submissions
             }
         });
     </script>
-</body>
-</html>
+    </body>
+    </html>
+    

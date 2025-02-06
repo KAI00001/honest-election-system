@@ -1,74 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voter Login</title>
+    <meta charset="UTF-8"> <!-- Character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive design settings -->
+    <title>Voter Login</title> <!-- Title for the browser tab -->
     <style>
         /* Global body styling */
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #2196F3, #64B5F6); /* Blue gradient */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: 'Arial', sans-serif; /* Setting font for the body */
+            background: linear-gradient(135deg, #2196F3, #64B5F6); /* Blue gradient background */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            display: flex; /* Flexbox for centering */
+            justify-content: center; /* Horizontally center the content */
+            align-items: center; /* Vertically center the content */
+            height: 100vh; /* Full height of the viewport */
         }
 
         /* Form container styling */
         .form-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 40px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            width: 100%; /* Full width */
+            max-width: 400px; /* Max width for the form */
+            padding: 40px; /* Padding inside the form */
+            background-color: #ffffff; /* White background for the form */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Soft shadow effect */
+            text-align: center; /* Center the text inside the form */
         }
 
         /* Heading styling */
         h1 {
-            margin-bottom: 20px;
-            font-size: 2rem;
-            color: #2196F3; /* Blue color */
-            font-weight: bold;
+            margin-bottom: 20px; /* Margin below the heading */
+            font-size: 2rem; /* Font size for the heading */
+            color: #2196F3; /* Blue color for the heading */
+            font-weight: bold; /* Make the heading bold */
         }
 
         /* Input field styling */
         .input-field {
-            width: 100%;
-            margin-bottom: 20px;
-            padding: 12px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
+            width: 100%; /* Full width of the input */
+            margin-bottom: 20px; /* Space between inputs */
+            padding: 12px; /* Padding inside the input */
+            font-size: 1rem; /* Font size for the input */
+            border: 1px solid #ccc; /* Light gray border */
+            border-radius: 5px; /* Rounded corners for the input */
+            box-sizing: border-box; /* Include padding and border in the element’s total width and height */
         }
 
         /* Submit button styling */
         .submit-button {
-            width: 100%;
-            padding: 12px;
-            font-size: 1.1rem;
-            background-color: #2196F3; /* Matching blue */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
+            width: 100%; /* Full width of the button */
+            padding: 12px; /* Padding inside the button */
+            font-size: 1.1rem; /* Font size for the button */
+            background-color: #2196F3; /* Blue background for the button */
+            color: white; /* White text color */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer when hovering */
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transitions for background color and scaling */
         }
 
         .submit-button:hover {
             background-color: #1976D2; /* Darker blue on hover */
-            transform: scale(1.05);
+            transform: scale(1.05); /* Slightly enlarge the button on hover */
         }
 
         /* Flash messages styling (if any) */
         .flash-message {
-            color: red;
-            font-weight: bold;
+            color: red; /* Red text for error messages */
+            font-weight: bold; /* Make the error message bold */
         }
     </style>
 </head>
@@ -81,7 +81,7 @@
         {% if messages %}
             <ul>
             {% for category, message in messages %}
-                <li class="flash-message">{{ message }}</li>
+                <li class="flash-message">{{ message }}</li> <!-- Display the flash message -->
             {% endfor %}
             </ul>
         {% endif %}
@@ -89,9 +89,9 @@
 
         <!-- Form for login -->
         <form action="/voters" method="POST">
-            <input class="input-field" type="text" name="username" placeholder="Enter LRN" required>
-            <input class="input-field" type="password" name="password" placeholder="Enter Password" required>
-            <button class="submit-button" type="submit">Login</button>
+            <input class="input-field" type="text" name="username" placeholder="Enter LRN" required> <!-- Input for LRN -->
+            <input class="input-field" type="password" name="password" placeholder="Enter Password" required> <!-- Input for password -->
+            <button class="submit-button" type="submit">Login</button> <!-- Submit button -->
         </form>
     </div>
 </body>
