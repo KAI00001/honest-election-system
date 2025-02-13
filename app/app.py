@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, redirect, flash, render_template, session, url_for  # Import necessary modules from Flask
 from werkzeug.security import generate_password_hash, check_password_hash  # Import functions for password hashing and verification
 from werkzeug.exceptions import InternalServerError  # Import an exception handler for internal server errors
-from .db_connection import create_connection  # Import the database connection function from db_connection.py
+from db_connection import create_connection  # Import the database connection function from db_connection.py
 from flask_cors import CORS  # Import CORS to allow cross-origin requests
 
 app = Flask(__name__)  # Initialize the Flask application
