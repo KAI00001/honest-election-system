@@ -12,13 +12,15 @@ def create_connection():
         
         # Attempt to create a connection to MySQL database
         connection = mysql.connector.connect(
-            host="127.0.0.1",  # MySQL server address (localhost)
-            user="kerbyyy",  # MySQL username
-            password="yoou",  # MySQL password
-            database="honest_election_system",  # Database name
-            charset="utf8mb4",  # Set character encoding to utf8mb4
-            connection_timeout=10  # Timeout in seconds for connection attempt
-        )
+    host="ijj1btjwrd3b7932.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",  # Host from ClearDB
+    user="o3egiz27a656xdgq",  # Username from ClearDB
+    password="hszpbzgm8nfo3gfh",  # Password from ClearDB
+    database="gcxbm3ju61sswz9b",  # Database name from ClearDB
+    port=3306,  # Default MySQL port
+    connection_timeout=10,  # Timeout in seconds for connection attempt
+    charset="utf8mb4"  # Set character encoding to utf8mb4
+)
+
         
         print("Connection attempt complete.")
         
