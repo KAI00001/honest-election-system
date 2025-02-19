@@ -1,164 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"> <!-- Specifies character encoding for the document -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures responsive layout -->
-    <title>Admin Dashboard</title> <!-- Title of the page displayed in browser tab -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
     <style>
         body {
-            font-family: Arial, sans-serif; /* Sets font for the body */
-            background-color: #f4f4f9; /* Sets background color for the page */
-            margin: 0; /* Removes default margin */
-            padding: 0; /* Removes default padding */
-            color: #333; /* Sets text color */
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
         }
 
         .container {
-            max-width: 1200px; /* Sets max width of content */
-            margin: auto; /* Centers the container */
-            padding: 20px; /* Adds padding around the container */
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
         }
 
         h1, h2 {
-            color: #4A90E2; /* Sets color for header text */
+            color: #4A90E2;
         }
 
         .box {
-            border: 1px solid #ddd; /* Adds a light border around boxes */
-            border-radius: 8px; /* Rounds the corners of the box */
-            padding: 20px; /* Adds padding inside the box */
-            margin-bottom: 20px; /* Adds margin below the box */
-            background-color: white; /* Sets background color of the box */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .form-input, .button {
-            padding: 10px; /* Adds padding inside input and button */
-            margin: 10px 0; /* Adds margin above and below input and button */
-            border-radius: 5px; /* Rounds corners of inputs and buttons */
-            border: 1px solid #ddd; /* Adds light border around inputs and buttons */
-            font-size: 1rem; /* Sets font size */
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
         }
 
         .button {
-            background-color: #4A90E2; /* Sets background color for button */
-            color: white; /* Sets text color to white */
-            border: none; /* Removes border from button */
-            cursor: pointer; /* Changes cursor to pointer on hover */
-            font-size: 1.2rem; /* Sets font size for the button */
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: background-color 0.3s ease;
         }
 
         .button:hover {
-            background-color: #357ABD; /* Changes background color on hover */
+            background-color: #357ABD;
         }
 
         table {
-            width: 100%; /* Sets table width to fill container */
-            margin-top: 20px; /* Adds margin above the table */
-            border-collapse: collapse; /* Ensures table borders collapse */
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
         }
 
         th, td {
-            padding: 10px; /* Adds padding inside table cells */
-            text-align: left; /* Aligns text to the left */
-            border-bottom: 1px solid #ddd; /* Adds a border at the bottom of each row */
-            word-wrap: break-word; /* Ensures text breaks to fit the cell */
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            word-wrap: break-word;
         }
 
         th {
-            background-color: #f4f4f9; /* Sets background color for table headers */
+            background-color: #f4f4f9;
         }
 
         td {
-            word-wrap: break-word; /* Forces text to break into new lines if necessary */
-            white-space: normal; /* Prevents overflow of long text */
+            white-space: normal;
         }
 
         .flash-message {
-            background-color: #d4edda; /* Sets background color for flash messages */
-            color: #155724; /* Sets text color for flash messages */
-            padding: 10px; /* Adds padding inside the flash message box */
-            margin-bottom: 20px; /* Adds margin below the flash message box */
-            border-radius: 5px; /* Rounds corners of flash message */
-            border: 1px solid #c3e6cb; /* Adds border around flash message */
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
         }
 
         .request-buttons button {
-            padding: 6px 12px; /* Adds padding inside buttons */
-            margin: 5px; /* Adds margin around buttons */
-            border: none; /* Removes border from buttons */
-            border-radius: 5px; /* Rounds corners of buttons */
-            cursor: pointer; /* Changes cursor to pointer on hover */
+            padding: 6px 12px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         .request-buttons button.approve {
-            background-color: #5cb85c; /* Sets background color for approve button (green) */
-            color: white; /* Sets text color to white */
+            background-color: #5cb85c;
+            color: white;
         }
 
         .request-buttons button.approve:hover {
-            background-color: #4cae4c; /* Changes background color on hover */
+            background-color: #4cae4c;
         }
 
         .request-buttons button.decline {
-            background-color: #d9534f; /* Sets background color for decline button (red) */
-            color: white; /* Sets text color to white */
+            background-color: #d9534f;
+            color: white;
         }
 
         .request-buttons button.decline:hover {
-            background-color: #c9302c; /* Changes background color on hover */
+            background-color: #c9302c;
         }
 
         .back-button {
-            position: absolute; /* Positions the button absolutely on the page */
-            top: 20px; /* Positions button 20px from the top */
-            right: 20px; /* Positions button 20px from the right */
-            background-color: gray; /* Sets background color for the button */
-            color: white; /* Sets text color to white */
-            border: none; /* Removes border from button */
-            padding: 10px 15px; /* Adds padding inside the button */
-            font-size: 1rem; /* Sets font size for button */
-            cursor: pointer; /* Changes cursor to pointer on hover */
-            border-radius: 5px; /* Rounds corners of the button */
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: gray;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
         }
 
         .back-button:hover {
-            background-color: #444; /* Changes background color on hover */
+            background-color: #444;
         }
 
         @media (max-width: 768px) {
             table th, table td {
-                font-size: 0.9rem; /* Reduces font size for smaller screens */
-                word-wrap: break-word; /* Ensures text wraps properly */
+                font-size: 0.9rem;
             }
 
             .box {
-                padding: 15px; /* Reduces padding inside boxes */
+                padding: 15px;
             }
 
             .button, .form-input {
-                font-size: 0.9rem; /* Adjusts input and button font sizes */
-                padding: 8px; /* Reduces padding for smaller screens */
+                font-size: 0.9rem;
+                padding: 8px;
             }
+
+            .container {
+                padding: 10px;
+            }
+        }
+
+        .box {
+            overflow-x: auto;
+        }
+
+        table {
+            min-width: 600px;
         }
     </style>
 </head>
 <body>
 
     <!-- Back Button -->
-    <a href="/home"> <!-- Link to go back to home page -->
-        <button class="back-button">Back</button> <!-- Button to go back -->
+    <a href="/home">
+        <button class="back-button" aria-label="Go back to home">Back</button>
     </a>
 
     <div class="container">
-        <h1>Admin Dashboard</h1> <!-- Header for the admin dashboard -->
+        <h1>Admin Dashboard</h1>
 
         <!-- Flash Message Section -->
-        {% with messages = get_flashed_messages(with_categories=true) %} <!-- Checks for flash messages -->
-            {% if messages %} <!-- If there are any messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
                 <div>
-                    {% for category, message in messages %} <!-- Loop through each message -->
-                        <div class="flash-message {{ category }}"> <!-- Display message with category as class -->
-                            {{ message }} <!-- Output the message text -->
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
                         </div>
                     {% endfor %}
                 </div>
@@ -167,27 +179,27 @@
 
         <!-- Box for Adding Valid LRN -->
         <div class="box">
-            <h2>Add Valid LRN</h2> <!-- Title for the Add LRN box -->
-            <form action="/admin-dashboard" method="POST"> <!-- Form to add new LRN -->
-                <input class="form-input" type="text" name="new_lrn" placeholder="Enter new LRN to add" required> <!-- Input field for LRN -->
-                <button class="button" type="submit">Add LRN</button> <!-- Submit button to add LRN -->
+            <h2>Add Valid LRN</h2>
+            <form action="/admin-dashboard" method="POST">
+                <input class="form-input" type="text" name="new_lrn" placeholder="Enter new LRN to add" required>
+                <button class="button" type="submit">Add LRN</button>
             </form>
         </div>
 
         <!-- Box for Voter Credentials -->
         <div class="box">
-            <h2>Voter Credentials</h2> <!-- Title for the Voter Credentials box -->
-            <table> <!-- Table for displaying voter information -->
+            <h2>Voter Credentials</h2>
+            <table>
                 <tr>
-                    <th>LRN</th> <!-- Table header for LRN -->
-                    <th>Name</th> <!-- Table header for Name -->
-                    <th>Email</th> <!-- Table header for Email -->
+                    <th>LRN</th>
+                    <th>Name</th>
+                    <th>Email</th>
                 </tr>
-                {% for voter in voters %} <!-- Loop through each voter -->
+                {% for voter in voters %}
                     <tr>
-                        <td>{{ voter.lrn }}</td> <!-- Display LRN -->
-                        <td>{{ voter.full_name }}</td> <!-- Display Name -->
-                        <td>{{ voter.email }}</td> <!-- Display Email -->
+                        <td>{{ voter.lrn }}</td>
+                        <td>{{ voter.full_name }}</td>
+                        <td>{{ voter.email }}</td>
                     </tr>
                 {% endfor %}
             </table>
@@ -195,15 +207,15 @@
 
         <!-- Box for Pending Party Lists -->
         <div class="box">
-            <h2>Pending Party Lists Application</h2> <!-- Title for Pending Party Lists -->
-            {% if party_list_requests %} <!-- If there are any pending requests -->
-                <table class="party-list-table"> <!-- Table for party list applications -->
+            <h2>Pending Party Lists Application</h2>
+            {% if party_list_requests %}
+                <table class="party-list-table">
                     <tr>
                         <th>Party Name</th>
                         <th>President</th>
                         <th>Actions</th>
                     </tr>
-                    {% for party in party_list_requests %} <!-- Loop through each party list request -->
+                    {% for party in party_list_requests %}
                         <tr>
                             <td>{{ party.party_name }}</td>
                             <td>{{ party.president_lrn }}</td>
