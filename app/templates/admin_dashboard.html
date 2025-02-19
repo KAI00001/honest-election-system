@@ -272,13 +272,13 @@
                         <li>
                             <strong>{{ application.position }}</strong> - {{ application.lrn }} <!-- Display position and LRN -->
                             <div class="request-buttons">
-                                <form action="/admin-dashboard" method="POST" style="display:inline;"> <!-- Form for accepting solo application -->
-                                    <input type="hidden" name="solo_application_id" value="{{ application.id }}"> <!-- Hidden input for application ID -->
-                                    <button type="submit" class="approve" name="approve_solo_application">Accept</button> <!-- Accept button -->
+                                <form action="/admin-dashboard" method="POST" style="display:inline;">
+                                    <input type="hidden" name="application_id" value="{{ application.id }}">
+                                    <button type="submit" class="approve" name="approve_solo_application">Accept</button>
                                 </form>
-                                <form action="/admin-dashboard" method="POST" style="display:inline;"> <!-- Form for declining solo application -->
-                                    <input type="hidden" name="solo_application_id" value="{{ application.id }}"> <!-- Hidden input for application ID -->
-                                    <button type="submit" class="decline" name="decline_solo_application">Decline</button> <!-- Decline button -->
+                                <form action="/admin-dashboard" method="POST" style="display:inline;">
+                                    <input type="hidden" name="application_id" value="{{ application.id }}">
+                                    <button type="submit" class="decline" name="decline_solo_application">Decline</button>
                                 </form>
                             </div>
                         </li>
