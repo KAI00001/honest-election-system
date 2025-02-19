@@ -38,21 +38,23 @@
         }
 
         /* Styling for back button */
-        .back-button {
-            position: absolute; /* Absolute positioning */
-            top: 20px; /* 20px from the top */
-            right: 20px; /* 20px from the right */
-            background-color: #808080; /* Gray background */
-            color: white; /* White text */
-            padding: 10px 20px; /* Padding around the button */
-            border-radius: 5px; /* Rounded corners */
-            text-decoration: none; /* Removes underline */
-            transition: background-color 0.3s; /* Smooth transition for hover effect */
-        }
+.back-button {
+    position: fixed; /* Ensures it stays in a fixed position relative to the viewport */
+    top: 20px; /* Fixed 20px from the top */
+    right: 20px; /* Fixed 20px from the right */
+    background-color: #808080; /* Gray background */
+    color: white; /* White text */
+    padding: 10px 20px; /* Padding around the button */
+    border-radius: 5px; /* Rounded corners */
+    text-decoration: none; /* Removes underline */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+    z-index: 9999; /* Ensures it appears above other elements */
+}
 
-        .back-button:hover { /* Hover effect for back button */
-            background-color: #606060; /* Darker gray on hover */
-        }
+.back-button:hover {
+    background-color: #606060; /* Darker gray on hover */
+}
+
     </style>
 </head>
 <body>
