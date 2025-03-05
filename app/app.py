@@ -3,9 +3,30 @@ from werkzeug.security import generate_password_hash, check_password_hash  # Imp
 from werkzeug.exceptions import InternalServerError  # Import an exception handler for internal server errors
 from app.db_connection import create_connection # Import the database connection function from db_connection.py
 from flask_cors import CORS  # Import CORS to allow cross-origin requests
+from functools import wraps
 
 app = Flask(__name__)  # Initialize the Flask application
 app.secret_key = 'your_secret_key'  # Set a secret key for session management (replace with a secure key)
+
+# Admin authentication decorator
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin'):  # Check if 'admin' key is in session
+            flash("Admin login required to access this page.", "danger")
+            return redirect(url_for('admin'))  # Redirect to admin login page
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Voter authentication decorator
+def voter_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('lrn'):  # Check if 'lrn' key is in session
+            flash("Voter login required to access this page.", "danger")
+            return redirect(url_for('voters'))  # Redirect to voter login page
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Handle Internal Server Errors
 @app.errorhandler(InternalServerError)  # Catch internal server errors
@@ -51,34 +72,38 @@ def login_lrn():
     return render_template('loginlrn.html')  # Render the login page if the request method is GET
 
 # Admin Login Route
-@app.route('/admin', methods=['POST', 'GET'])  # Define a route for the admin login page
+# Admin Login Route
+@app.route('/admin', methods=['POST', 'GET'])
 def admin():
-    if request.method == 'POST':  # Check if the request method is POST (form submission)
-        password = request.form['password']  # Get the password input from the form
+    if request.method == 'POST':
+        password = request.form['password']
 
-        connection = create_connection()  # Establish a database connection
-        if connection is None:  # If connection fails
-            flash("Database connection error. Please try again later.", "danger")  # Show an error message
-            return redirect(url_for('admin'))  # Redirect back to the admin login page
+        connection = create_connection()
+        if connection is None:
+            flash("Database connection error. Please try again later.", "danger")
+            return redirect(url_for('admin'))
 
         try:
-            cursor = connection.cursor(dictionary=True)  # Create a database cursor with dictionary format
-            cursor.execute("SELECT * FROM admins WHERE username = 'admin'")  # Query the database for the admin account
-            admin_data = cursor.fetchone()  # Fetch the result
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM admins WHERE username = 'admin'")
+            admin_data = cursor.fetchone()
 
-            if admin_data and check_password_hash(admin_data['password'], password):  # Check if the password is correct
-                return redirect(url_for('admin_dashboard'))  # Redirect to the admin dashboard if login is successful
+            if admin_data and check_password_hash(admin_data['password'], password):
+                session['admin'] = True  # Set admin session key
+                flash("Admin login successful!", "success")
+                return redirect(url_for('admin_dashboard'))
             else:
-                flash("Invalid password. Access Denied.", "danger")  # Show an error message for incorrect password
+                flash("Invalid password. Access Denied.", "danger")
         except Exception as e:
-            flash(f"An error occurred: {e}", "danger")  # Show an error message if an exception occurs
+            flash(f"An error occurred: {e}", "danger")
         finally:
-            connection.close()  # Close the database connection
+            connection.close()
 
-    return render_template('admin.html')  # Render the admin login page if the request method is GET
+    return render_template('admin.html')
 
 # Admin Dashboard Route
 @app.route('/admin-dashboard', methods=['GET', 'POST'])  # Define a route for the admin dashboard
+@admin_required
 def admin_dashboard():
     connection = create_connection()  # Establish a database connection
     if connection is None:  # If the connection fails
@@ -343,56 +368,47 @@ def index():
 # Voters Route to fetch and display all voters
 import traceback  # Import traceback to handle and display errors in case of an exception
 
-# Voters Route to handle login and redirect to vote page
+# Voter Login Route
 @app.route('/voters', methods=['GET', 'POST'])
 def voters():
-    connection = create_connection()  # Create a connection to the database
+    connection = create_connection()
     if connection is None:
-        flash("Database connection error. Please try again later.", "danger")  # Flash message if connection fails
-        return redirect(url_for('home'))  # Redirect to home if database connection fails
+        flash("Database connection error. Please try again later.", "danger")
+        return redirect(url_for('home'))
 
     try:
-        cursor = connection.cursor(dictionary=True)  # Initialize cursor to interact with the database
+        cursor = connection.cursor(dictionary=True)
 
-        if request.method == 'POST':  # Handle POST request when the form is submitted
-            lrn = request.form.get('username')  # Get the LRN (username) from the form
-            password = request.form.get('password')  # Get the password from the form
+        if request.method == 'POST':
+            lrn = request.form.get('username')
+            password = request.form.get('password')
 
-            if not lrn or not password:  # Check if both LRN and password are provided
-                flash("LRN and Password are required!", "danger")  # Show error message if missing
-                return redirect(url_for('voters'))  # Redirect back to voters page if fields are empty
+            if not lrn or not password:
+                flash("LRN and Password are required!", "danger")
+                return redirect(url_for('voters'))
 
-            cursor.execute("SELECT * FROM voters WHERE lrn = %s", (lrn,))  # Query database for the voter with the given LRN
-            voter = cursor.fetchone()  # Fetch the result of the query
+            cursor.execute("SELECT * FROM voters WHERE lrn = %s", (lrn,))
+            voter = cursor.fetchone()
 
-            if voter:
-                if voter['password'] == password:  # Check if the entered password matches the stored password
-                    session['lrn'] = voter['lrn']  # Store the LRN in the session
-                    session['full_name'] = voter['full_name']  # Store the full name in the session
-                    flash(f"Welcome, {voter['full_name']}!", "success")  # Show success message on successful login
-                    return redirect(url_for('vote_page'))  # Redirect to vote_page after successful login
-                else:
-                    flash("Incorrect password!", "danger")  # Show error if the password is incorrect
+            if voter and voter['password'] == password:
+                session['lrn'] = voter['lrn']  # Set voter session key
+                session['full_name'] = voter['full_name']
+                flash(f"Welcome, {voter['full_name']}!", "success")
+                return redirect(url_for('vote_page'))
             else:
-                flash("LRN not found!", "danger")  # Show error if the LRN is not found in the database
+                flash("Invalid LRN or password.", "danger")
 
-            return redirect(url_for('voters'))  # Return to voters page if login fails
-
-        # Render the login page for GET requests
-        return render_template('voter_login.html')  # Render the login template
-
+        return render_template('voter_login.html')
     except Exception as e:
-        # Print full error traceback for debugging
-        print("Error occurred:", e)
-        traceback.print_exc()  # Prints the stack trace to the console
-        flash(f"An error occurred: {e}", "danger")  # Show error message if an exception occurs
+        flash(f"An error occurred: {e}", "danger")
     finally:
         if connection:
-            connection.close()  # Ensure the database connection is closed when done
+            connection.close()
 
-    return redirect(url_for('home'))  # Redirect to home in case of an error
+    return redirect(url_for('home'))
 
 @app.route('/vote-page', methods=['GET', 'POST'])
+@voter_required
 def vote_page():
     connection = create_connection()  # Create a connection to the database
     if connection is None:
@@ -562,6 +578,12 @@ def vote_page():
 
     return redirect(url_for('home'))  # Redirect to home in case of error
 
+# Logout route for both voters and admins
+@app.route('/logout')
+def logout():
+    session.clear()  # Clear all session data
+    flash("You have been logged out.", "info")
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run(debug=True)  # Run the Flask application
