@@ -102,84 +102,118 @@ def admin():
     return render_template('admin.html')
 
 # Admin Dashboard Route
-@app.route('/admin-dashboard', methods=['GET', 'POST'])  # Define a route for the admin dashboard
+@app.route('/admin-dashboard', methods=['GET', 'POST'])
 @admin_required
 def admin_dashboard():
-    connection = create_connection()  # Establish a database connection
-    if connection is None:  # If the connection fails
-        flash("Database connection error. Please try again later.", "danger")  # Show an error message
-        return redirect(url_for('home'))  # Redirect to the homepage
+    connection = create_connection()
+    if connection is None:
+        flash("Database connection error. Please try again later.", "danger")
+        return redirect(url_for('home'))
 
     try:
-        cursor = connection.cursor(dictionary=True)  # Create a cursor for executing SQL queries
+        cursor = connection.cursor(dictionary=True)
 
         # Fetch valid LRN list and voters data
-        cursor.execute("SELECT * FROM valid_lrns")  # Get all valid LRNs from the database
-        valid_lrns = cursor.fetchall()  # Store the fetched LRNs in a variable
-        cursor.execute("SELECT * FROM voters")  # Get all voters
-        voters = cursor.fetchall()  # Store the fetched voters data
+        cursor.execute("SELECT * FROM valid_lrns")
+        valid_lrns = cursor.fetchall()
+        cursor.execute("SELECT * FROM voters")
+        voters = cursor.fetchall()
 
         # Fetch pending party list applications and solo applications
-        cursor.execute("SELECT * FROM party_lists WHERE status = 'pending'")  # Get pending party list requests
-        party_list_requests = cursor.fetchall()  # Store them in a variable
-        cursor.execute("SELECT * FROM solo_applications WHERE status = 'pending'")  # Get pending solo applications
-        solo_applications = cursor.fetchall()  # Store them in a variable
+        cursor.execute("SELECT * FROM party_lists WHERE status = 'pending'")
+        party_list_requests = cursor.fetchall()
+        cursor.execute("SELECT * FROM solo_applications WHERE status = 'pending'")
+        solo_applications = cursor.fetchall()
 
-        if request.method == 'POST':  # Check if the request method is POST (form submission)
-            new_lrn = request.form.get('new_lrn')  # Get the new LRN from the form input
-            if new_lrn:  # If an LRN is provided
-                cursor.execute("INSERT INTO valid_lrns (lrn) VALUES (%s)", (new_lrn,))  # Insert into the database
-                connection.commit()  # Save changes
-                flash("New LRN added successfully!", "success")  # Show a success message
-                return redirect(url_for('admin_dashboard'))  # Reload the admin dashboard
+        # Fetch vote results
+        cursor.execute("""
+            SELECT v.position, v.candidate_id, COUNT(*) AS votes, 
+                   c.full_name, c.type, c.party_name
+            FROM votes v
+            LEFT JOIN (
+                SELECT id AS candidate_id, full_name, 'solo' AS type, NULL AS party_name
+                FROM solo_applications
+                WHERE status = 'approved'
+                UNION ALL
+                SELECT party_members.id AS candidate_id, party_members.full_name, 
+                       'party_member' AS type, party_lists.party_name
+                FROM party_lists
+                JOIN party_members ON party_lists.id = party_members.party_list_id
+                WHERE party_lists.status = 'approved'
+            ) c ON v.candidate_id = c.candidate_id
+            GROUP BY v.position, v.candidate_id, c.full_name, c.type, c.party_name
+            ORDER BY v.position, votes DESC
+        """)
+        vote_results = cursor.fetchall()
+
+        if request.method == 'POST':
+            new_lrn = request.form.get('new_lrn')
+            if new_lrn:
+                # Validate LRN length (must be exactly 12 digits)
+                if len(new_lrn) != 12 or not new_lrn.isdigit():
+                    flash("LRN must be exactly 12 digits.", "danger")
+                    return redirect(url_for('admin_dashboard'))
+
+                # Check if LRN already exists
+                cursor.execute("SELECT * FROM valid_lrns WHERE lrn = %s", (new_lrn,))
+                if cursor.fetchone():
+                    flash("LRN already exists in the database.", "danger")
+                    return redirect(url_for('admin_dashboard'))
+
+                # Insert new LRN into the database
+                cursor.execute("INSERT INTO valid_lrns (lrn) VALUES (%s)", (new_lrn,))
+                connection.commit()
+                flash("New LRN added successfully!", "success")
+                return redirect(url_for('admin_dashboard'))
 
             # Handle approval or decline of party list requests
-            if 'approve_party_list' in request.form:  # If the approve button is clicked
-                party_list_id = request.form.get('party_list_id')  # Get the party list ID
+            if 'approve_party_list' in request.form:
+                party_list_id = request.form.get('party_list_id')
                 if party_list_id:
-                    cursor.execute("UPDATE party_lists SET status = 'approved' WHERE id = %s", (party_list_id,))  # Approve the request
+                    cursor.execute("UPDATE party_lists SET status = 'approved' WHERE id = %s", (party_list_id,))
                     connection.commit()
-                    flash("Party list request approved.", "success")  # Show success message
-                return redirect(url_for('admin_dashboard'))  # Reload the dashboard
+                    flash("Party list request approved.", "success")
+                return redirect(url_for('admin_dashboard'))
 
-            elif 'decline_party_list' in request.form:  # If the decline button is clicked
-                party_list_id = request.form.get('party_list_id')  # Get the party list ID
+            elif 'decline_party_list' in request.form:
+                party_list_id = request.form.get('party_list_id')
                 if party_list_id:
-                    cursor.execute("UPDATE party_lists SET status = 'rejected' WHERE id = %s", (party_list_id,))  # Reject the request
+                    cursor.execute("UPDATE party_lists SET status = 'rejected' WHERE id = %s", (party_list_id,))
                     connection.commit()
-                    flash("Party list request declined.", "danger")  # Show error message
-                return redirect(url_for('admin_dashboard'))  # Reload the dashboard
+                    flash("Party list request declined.", "danger")
+                return redirect(url_for('admin_dashboard'))
 
             # Handle approval or decline of solo applications
-            if 'approve_solo_application' in request.form:  # If the approve button is clicked
-                application_id = request.form.get('application_id')  # Get the solo application ID
+            if 'approve_solo_application' in request.form:
+                application_id = request.form.get('application_id')
                 if application_id:
-                    cursor.execute("UPDATE solo_applications SET status = 'approved' WHERE id = %s", (application_id,))  # Approve the request
+                    cursor.execute("UPDATE solo_applications SET status = 'approved' WHERE id = %s", (application_id,))
                     connection.commit()
-                    flash("Solo application approved.", "success")  # Show success message
-                return redirect(url_for('admin_dashboard'))  # Reload the dashboard
+                    flash("Solo application approved.", "success")
+                return redirect(url_for('admin_dashboard'))
 
-            elif 'decline_solo_application' in request.form:  # If the decline button is clicked
-                application_id = request.form.get('application_id')  # Get the solo application ID
+            elif 'decline_solo_application' in request.form:
+                application_id = request.form.get('application_id')
                 if application_id:
-                    cursor.execute("UPDATE solo_applications SET status = 'rejected' WHERE id = %s", (application_id,))  # Reject the request
+                    cursor.execute("UPDATE solo_applications SET status = 'rejected' WHERE id = %s", (application_id,))
                     connection.commit()
-                    flash("Solo application rejected.", "danger")  # Show error message
-                return redirect(url_for('admin_dashboard'))  # Reload the dashboard
+                    flash("Solo application rejected.", "danger")
+                return redirect(url_for('admin_dashboard'))
 
         # Render the admin dashboard template with fetched data
         return render_template('admin_dashboard.html', 
-                               valid_lrns=valid_lrns,  # Pass valid LRN list to the template
-                               voters=voters,  # Pass voters data to the template
-                               party_list_requests=party_list_requests,  # Pass party list requests
-                               solo_applications=solo_applications)  # Pass solo applications
+                               valid_lrns=valid_lrns, 
+                               voters=voters, 
+                               party_list_requests=party_list_requests, 
+                               solo_applications=solo_applications,
+                               vote_results=vote_results)
 
-    except Exception as e:  # Handle errors
-        flash(f"Error occurred: {e}", "danger")  # Show an error message
+    except Exception as e:
+        flash(f"Error occurred: {e}", "danger")
     finally:
-        connection.close()  # Close the database connection
+        connection.close()
 
-    return redirect(url_for('home'))  # Redirect to the homepage if an error occurs
+    return redirect(url_for('home'))
 
 @app.route('/application', methods=['GET', 'POST'])  # Route for the application page, handles both GET and POST methods
 def application():
@@ -410,63 +444,39 @@ def voters():
 @app.route('/vote-page', methods=['GET', 'POST'])
 @voter_required
 def vote_page():
-    connection = create_connection()  # Create a connection to the database
+    connection = create_connection()
     if connection is None:
-        flash("Database connection error. Please try again later.", "danger")  # Flash an error if the connection fails
-        return redirect(url_for('home'))  # Redirect to home page if the connection fails
+        flash("Database connection error. Please try again later.", "danger")
+        return redirect(url_for('home'))
 
     try:
-        cursor = connection.cursor(dictionary=True)  # Initialize cursor for the database
+        cursor = connection.cursor(dictionary=True)
 
         # Fetch positions from the positions table
         cursor.execute("SELECT * FROM positions")
-        positions = cursor.fetchall()  # Fetch all positions
-
-        # Create a mapping of position ID to name
-        position_map = {pos['id']: pos['name'] for pos in positions}
-
-        # Fetch ongoing vote results, grouped by position and candidate type
-        cursor.execute("""
-            SELECT v.position, v.candidate_id, COUNT(*) AS votes, 
-                   c.full_name, c.type, c.party_name
-            FROM votes v
-            LEFT JOIN (
-                SELECT id AS candidate_id, full_name, 'solo' AS type, NULL AS party_name
-                FROM solo_applications
-                WHERE status = 'approved'
-                UNION ALL
-                SELECT party_members.id AS candidate_id, party_members.full_name, 
-                       'party_member' AS type, party_lists.party_name
-                FROM party_lists
-                JOIN party_members ON party_lists.id = party_members.party_list_id
-                WHERE party_lists.status = 'approved'
-            ) c ON v.candidate_id = c.candidate_id
-            GROUP BY v.position, v.candidate_id, c.full_name, c.type, c.party_name
-            ORDER BY v.position, votes DESC
-        """)
-        vote_results = cursor.fetchall()  # Fetch the results of the votes
+        positions = cursor.fetchall()
 
         # Handle POST request for voting
         if request.method == 'POST':
-            position = request.form.get('position')  # Get selected position from the form
-            candidate_id = request.form.get('candidate')  # Get selected candidate from the form
-            candidate_type = request.form.get('candidate_type')  # Get candidate type (solo or party member)
+            position = request.form.get('position')
+            candidate_id = request.form.get('candidate')
+            candidate_type = request.form.get('candidate_type')
 
             if not position or not candidate_id or not candidate_type:
                 flash("You must select a position, a candidate, and the candidate type!", "danger")
-                return redirect(url_for('vote_page'))  # Redirect to vote page if fields are empty
-
-            try:
-                position = int(position)  # Convert position to an integer
-                candidate_id = int(candidate_id)  # Convert candidate ID to an integer
-            except ValueError:
-                flash("Invalid position or candidate ID.", "danger")  # Handle invalid ID format
                 return redirect(url_for('vote_page'))
 
-            voter_lrn = session.get('lrn')  # Get the voter LRN from the session
+            try:
+                position = int(position)
+                candidate_id = int(candidate_id)
+            except ValueError:
+                flash("Invalid position or candidate ID.", "danger")
+                return redirect(url_for('vote_page'))
+
+            voter_lrn = session.get('lrn')
             if not voter_lrn:
-                flash("Session expired. Please log in again.", "danger")  # Handle expired session
-                return redirect(url_for('voters'))  # Redirect to login page
+                flash("Session expired. Please log in again.", "danger")
+                return redirect(url_for('voters'))
 
             # Check if the voter has already voted for the selected position
             cursor.execute("""
@@ -476,8 +486,8 @@ def vote_page():
             existing_vote = cursor.fetchone()
 
             if existing_vote:
-                flash(f"You have already voted for {position_map.get(position, 'this position')}!", "danger")
-                return redirect(url_for('vote_page'))  # Redirect if the voter already voted
+                flash(f"You have already voted for this position!", "danger")
+                return redirect(url_for('vote_page'))
 
             # Validate candidate based on type (solo or party)
             valid_candidate = None
@@ -488,34 +498,41 @@ def vote_page():
                     JOIN party_lists ON party_members.party_list_id = party_lists.id
                     WHERE party_members.id = %s AND party_lists.status = 'approved'
                 """, (candidate_id,))
-                valid_candidate = cursor.fetchone()  # Check if party member is valid
+                valid_candidate = cursor.fetchone()
 
             elif candidate_type == 'solo':
                 cursor.execute("""
                     SELECT id FROM solo_applications
                     WHERE id = %s AND status = 'approved'
                 """, (candidate_id,))
-                valid_candidate = cursor.fetchone()  # Check if solo applicant is valid
+                valid_candidate = cursor.fetchone()
 
             if not valid_candidate:
                 flash("Invalid candidate selection.", "danger")
-                return redirect(url_for('vote_page'))  # Redirect if candidate is invalid
+                return redirect(url_for('vote_page'))
 
             # Insert the vote into the votes table
             cursor.execute("""
                 INSERT INTO votes (voter_lrn, position, candidate_id, candidate_type)
                 VALUES (%s, %s, %s, %s)
             """, (voter_lrn, position, candidate_id, candidate_type))
-            connection.commit()  # Commit the transaction
+            connection.commit()
+
+            # Store the voted position in the session
+            if 'voted_positions' not in session:
+                session['voted_positions'] = []
+            session['voted_positions'].append(position)
+            session.modified = True  # Ensure the session is saved
+
             flash("Vote submitted successfully!", "success")
-            return redirect(url_for('vote_page'))  # Redirect after voting successfully
+            return redirect(url_for('vote_page'))
 
         # Handle GET request to fetch candidates for a selected position
         position_id = request.args.get('position')  # Get position ID from query parameters
         if position_id:
             try:
                 position_id = int(position_id)  # Convert position ID to integer
-                position_name = position_map.get(position_id)  # Get the position name
+                position_name = next((pos['name'] for pos in positions if pos['id'] == position_id), None)
 
                 if position_name:
                     # Fetch approved solo applicants for the position
@@ -553,37 +570,24 @@ def vote_page():
                         })
 
                     if not candidates:
-                        return jsonify({'message': 'No candidates available for this position.'})  # Return if no candidates
+                        return jsonify({'message': 'No candidates available for this position.'})
                     return jsonify({'candidates': candidates})  # Return list of candidates
-
             except ValueError:
-                flash("Invalid position ID.", "danger")  # Handle invalid position ID
+                flash("Invalid position ID.", "danger")
             except Exception as e:
-                flash(f"Error fetching candidates: {e}", "danger")  # Flash error if something goes wrong
-                return jsonify({'error': 'Error fetching candidates'}), 500  # Return error response
+                flash(f"Error fetching candidates: {e}", "danger")
+                return jsonify({'error': 'Error fetching candidates'}), 500
 
-        # Render the vote page with positions and vote results
-        return render_template(
-            'vote_page.html',
-            positions=positions,
-            vote_results=vote_results
-        )
+        # Render the vote page with positions and voted roles
+        return render_template('vote_page.html', positions=positions)
 
     except Exception as e:
-        print(f"Error occurred in vote_page: {e}")  # Print error for debugging
-        flash(f"An error occurred: {e}", "danger")  # Flash a general error message
+        print(f"Error occurred in vote_page: {e}")
+        flash(f"An error occurred: {e}", "danger")
     finally:
         if connection:
-            connection.close()  # Close the connection to the database
+            connection.close()
 
-    return redirect(url_for('home'))  # Redirect to home in case of error
-
-# Logout route for both voters and admins
-@app.route('/logout')
-def logout():
-    session.clear()  # Clear all session data
-    flash("You have been logged out.", "info")
     return redirect(url_for('home'))
-
 if __name__ == '__main__':
     app.run(debug=True)  # Run the Flask application

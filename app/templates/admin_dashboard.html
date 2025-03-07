@@ -4,7 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <style>
+        /* Your existing styles from vote_page.html */
+        .form-select {
+            color: #000 !important;
+            background-color: #fff !important;
+            border: 1px solid #ced4da;
+            height: 40px;
+        }
+
+        .form-select option {
+            color: #000 !important;
+            background-color: #fff !important;
+            font-size: 16px;
+        }
+
+        .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+        }
+
+        .alert {
+            margin-top: 20px;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        .no-candidates {
+            color: red;
+            font-style: italic;
+        }
+
+        /* Styling for back button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #808080;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            z-index: 9999;
+        }
+
+        .back-button:hover {
+            background-color: #606060;
+        }
+
+        /* Additional styles for admin dashboard */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -109,23 +161,6 @@
             background-color: #c9302c;
         }
 
-        .back-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: gray;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .back-button:hover {
-            background-color: #444;
-        }
-
         @media (max-width: 768px) {
             table th, table td {
                 font-size: 0.9rem;
@@ -155,7 +190,6 @@
     </style>
 </head>
 <body>
-
     <!-- Back Button -->
     <a href="/home">
         <button class="back-button" aria-label="Go back to home">Back</button>
@@ -185,6 +219,19 @@
                 <button class="button" type="submit">Add LRN</button>
             </form>
         </div>
+
+        <!-- Flash Message Section -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <div>
+        {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
 
         <!-- Box for Voter Credentials -->
         <div class="box">
@@ -265,7 +312,38 @@
             {% endif %}
         </div>
 
+        <!-- Box for Vote Results -->
+        <div class="box">
+            <h2>Vote Progress</h2>
+            {% if vote_results %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Candidate</th>
+                            <th>Votes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in vote_results %}
+                            <tr>
+                                <td>{{ result.position }}</td>
+                                <td>
+                                    {% if result.type == 'party_member' %}
+                                        {{ result.full_name }} ({{ result.party_name }})
+                                    {% else %}
+                                        {{ result.full_name }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ result.votes }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No vote results available at the moment.</p>
+            {% endif %}
+        </div>
     </div>
-
 </body>
 </html>
