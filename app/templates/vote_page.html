@@ -181,20 +181,27 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Indicator for voted roles -->
-<div id="voted-roles" class="mb-4">
-    {% if session.get('voted_positions') %}
-        {% for position_id in session['voted_positions'] %}
-            {% for position in positions %}
-                {% if position.id == position_id %}
+        <!-- Persistent voted positions from database -->
+        <div id="voted-roles" class="mb-4">
+            {% if voted_positions %}
+                {% for position in voted_positions %}
                     <div class="alert alert-success">
                         You Voted For <strong>{{ position.name }}</strong> Position
                     </div>
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-    {% endif %}
-</div>
+                {% endfor %}
+            {% endif %}
+            {% if session.get('voted_positions') %}
+                {% for position_id in session['voted_positions'] %}
+                    {% for position in positions %}
+                        {% if position.id == position_id and not voted_positions %}
+                            <div class="alert alert-success">
+                                You Voted For <strong>{{ position.name }}</strong> Position
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+        </div>
 
         <!-- Voting form -->
         <form method="POST" action="/vote-page">
@@ -232,10 +239,10 @@
             const positionId = document.getElementById('position').value;
             const candidateSelect = document.getElementById('candidate');
             const noCandidatesMessage = document.getElementById('no-candidates');
-
+    
             candidateSelect.innerHTML = '<option value="" disabled selected>Select a candidate</option>';
             noCandidatesMessage.classList.add('d-none');
-
+    
             if (positionId) {
                 fetch(`/vote-page?position=${positionId}`)
                     .then(response => response.json())
@@ -244,6 +251,7 @@
                             data.candidates.forEach(candidate => {
                                 const option = document.createElement('option');
                                 option.value = candidate.id;
+                                // Display just the formatted name (LRN is no longer included)
                                 option.textContent = candidate.name;
                                 option.dataset.type = candidate.type;
                                 candidateSelect.appendChild(option);
@@ -258,20 +266,12 @@
                     });
             }
         }
-
+    
         document.getElementById('candidate').addEventListener('change', function () {
             const selectedOption = this.options[this.selectedIndex];
             const candidateType = selectedOption.dataset.type;
             document.getElementById('candidate_type').value = candidateType;
         });
-
-        // Function to remove flash messages after 5 seconds
-        setTimeout(function() {
-            var alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                alert.style.display = 'none';
-            });
-        }, 5000); // 5000 milliseconds = 5 seconds
     </script>
 </body>
 </html>

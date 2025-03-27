@@ -460,6 +460,15 @@ def vote_page():
         cursor.execute("SELECT * FROM positions")
         positions = cursor.fetchall()
 
+        # Fetch all positions the voter has voted for from the database
+        cursor.execute("""
+            SELECT DISTINCT v.position, p.name 
+            FROM votes v
+            JOIN positions p ON v.position = p.id
+            WHERE v.voter_lrn = %s
+        """, (voter_lrn,))
+        voted_positions = cursor.fetchall()
+
         # Handle POST request for voting
         if request.method == 'POST':
             position = request.form.get('position')
@@ -525,7 +534,7 @@ def vote_page():
             cursor.execute("SELECT name FROM positions WHERE id = %s", (position,))
             position_name = cursor.fetchone()['name']
 
-            # Update voted positions in session
+            # Update session with voted positions (for immediate UI feedback)
             if 'voted_positions' not in session:
                 session['voted_positions'] = []
             if position not in session['voted_positions']:
@@ -535,12 +544,7 @@ def vote_page():
             flash(f"You Voted For {position_name} Position", "success")
             return redirect(url_for('vote_page'))
 
-        # For GET requests, get current voted positions from database
-        cursor.execute("SELECT DISTINCT position FROM votes WHERE voter_lrn = %s", (voter_lrn,))
-        db_voted_positions = [row['position'] for row in cursor.fetchall()]
-        session['voted_positions'] = db_voted_positions
-
-        # Rest of your existing GET request handling...
+        # For AJAX candidate loading
         position_id = request.args.get('position')
         if position_id:
             try:
@@ -548,35 +552,40 @@ def vote_page():
                 position_name = next((pos['name'] for pos in positions if pos['id'] == position_id), None)
 
                 if position_name:
+                    # Get solo candidates (only name and ID)
                     cursor.execute("""
-                        SELECT id AS candidate_id, full_name 
+                        SELECT id AS candidate_id, full_name AS name
                         FROM solo_applications 
                         WHERE position = %s AND status = 'approved'
                     """, (position_name,))
                     solo_candidates = cursor.fetchall()
 
+                    # Get party candidates (name with party name, no LRN)
                     cursor.execute("""
-                        SELECT party_members.id AS candidate_id, party_lists.party_name, party_members.full_name
+                        SELECT 
+                            party_members.id AS candidate_id,
+                            CONCAT(party_members.full_name, ' (', party_lists.party_name, ')') AS name
                         FROM party_lists
                         JOIN party_members ON party_lists.id = party_members.party_list_id
                         WHERE party_lists.status = 'approved' AND party_members.position = %s
                     """, (position_name,))
-                    party_lists = cursor.fetchall()
+                    party_candidates = cursor.fetchall()
 
                     candidates = []
-                    for solo in solo_candidates:
+                    # Add solo candidates
+                    for candidate in solo_candidates:
                         candidates.append({
-                            'id': solo['candidate_id'],
-                            'name': solo['full_name'],
+                            'id': candidate['candidate_id'],
+                            'name': candidate['name'],
                             'type': 'solo'
                         })
 
-                    for party in party_lists:
+                    # Add party candidates
+                    for candidate in party_candidates:
                         candidates.append({
-                            'id': party['candidate_id'],
-                            'name': party['full_name'],
-                            'type': 'party_member',
-                            'party_name': party['party_name']
+                            'id': candidate['candidate_id'],
+                            'name': candidate['name'],
+                            'type': 'party_member'
                         })
 
                     if not candidates:
@@ -588,7 +597,9 @@ def vote_page():
                 flash(f"Error fetching candidates: {e}", "danger")
                 return jsonify({'error': 'Error fetching candidates'}), 500
 
-        return render_template('vote_page.html', positions=positions)
+        return render_template('vote_page.html', 
+                            positions=positions,
+                            voted_positions=voted_positions)
 
     except Exception as e:
         print(f"Error occurred in vote_page: {e}")
