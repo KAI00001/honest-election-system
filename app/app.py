@@ -425,7 +425,10 @@ def voters():
             voter = cursor.fetchone()
 
             if voter and voter['password'] == password:
-                session['lrn'] = voter['lrn']  # Set voter session key
+                # Clear only the voting-related session data
+                if 'voted_positions' in session:
+                    session.pop('voted_positions')
+                session['lrn'] = voter['lrn']
                 session['full_name'] = voter['full_name']
                 flash(f"Welcome, {voter['full_name']}!", "success")
                 return redirect(url_for('vote_page'))
@@ -451,6 +454,7 @@ def vote_page():
 
     try:
         cursor = connection.cursor(dictionary=True)
+        voter_lrn = session.get('lrn')
 
         # Fetch positions from the positions table
         cursor.execute("SELECT * FROM positions")
@@ -473,7 +477,6 @@ def vote_page():
                 flash("Invalid position or candidate ID.", "danger")
                 return redirect(url_for('vote_page'))
 
-            voter_lrn = session.get('lrn')
             if not voter_lrn:
                 flash("Session expired. Please log in again.", "danger")
                 return redirect(url_for('voters'))
@@ -481,8 +484,8 @@ def vote_page():
             # Check if the voter has already voted for the selected position
             cursor.execute("""
                 SELECT * FROM votes 
-                WHERE voter_lrn = %s AND position = %s AND candidate_type = %s
-            """, (voter_lrn, position, candidate_type))
+                WHERE voter_lrn = %s AND position = %s
+            """, (voter_lrn, position))
             existing_vote = cursor.fetchone()
 
             if existing_vote:
@@ -518,24 +521,29 @@ def vote_page():
             """, (voter_lrn, position, candidate_id, candidate_type))
             connection.commit()
 
-            # Store the voted position in the session
+            # Update voted positions in session
             if 'voted_positions' not in session:
                 session['voted_positions'] = []
-            session['voted_positions'].append(position)
-            session.modified = True  # Ensure the session is saved
+            if position not in session['voted_positions']:
+                session['voted_positions'].append(position)
+            session.modified = True
 
             flash("Vote submitted successfully!", "success")
             return redirect(url_for('vote_page'))
 
-        # Handle GET request to fetch candidates for a selected position
-        position_id = request.args.get('position')  # Get position ID from query parameters
+        # For GET requests, get current voted positions from database
+        cursor.execute("SELECT DISTINCT position FROM votes WHERE voter_lrn = %s", (voter_lrn,))
+        db_voted_positions = [row['position'] for row in cursor.fetchall()]
+        session['voted_positions'] = db_voted_positions
+
+        # Rest of your existing GET request handling...
+        position_id = request.args.get('position')
         if position_id:
             try:
-                position_id = int(position_id)  # Convert position ID to integer
+                position_id = int(position_id)
                 position_name = next((pos['name'] for pos in positions if pos['id'] == position_id), None)
 
                 if position_name:
-                    # Fetch approved solo applicants for the position
                     cursor.execute("""
                         SELECT id AS candidate_id, full_name 
                         FROM solo_applications 
@@ -543,7 +551,6 @@ def vote_page():
                     """, (position_name,))
                     solo_candidates = cursor.fetchall()
 
-                    # Fetch approved party list members for the position
                     cursor.execute("""
                         SELECT party_members.id AS candidate_id, party_lists.party_name, party_members.full_name
                         FROM party_lists
@@ -552,7 +559,6 @@ def vote_page():
                     """, (position_name,))
                     party_lists = cursor.fetchall()
 
-                    # Combine solo applicants and party list members
                     candidates = []
                     for solo in solo_candidates:
                         candidates.append({
@@ -571,14 +577,13 @@ def vote_page():
 
                     if not candidates:
                         return jsonify({'message': 'No candidates available for this position.'})
-                    return jsonify({'candidates': candidates})  # Return list of candidates
+                    return jsonify({'candidates': candidates})
             except ValueError:
                 flash("Invalid position ID.", "danger")
             except Exception as e:
                 flash(f"Error fetching candidates: {e}", "danger")
                 return jsonify({'error': 'Error fetching candidates'}), 500
 
-        # Render the vote page with positions and voted roles
         return render_template('vote_page.html', positions=positions)
 
     except Exception as e:
