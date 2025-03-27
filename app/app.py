@@ -521,6 +521,10 @@ def vote_page():
             """, (voter_lrn, position, candidate_id, candidate_type))
             connection.commit()
 
+            # Get position name for the success message
+            cursor.execute("SELECT name FROM positions WHERE id = %s", (position,))
+            position_name = cursor.fetchone()['name']
+
             # Update voted positions in session
             if 'voted_positions' not in session:
                 session['voted_positions'] = []
@@ -528,7 +532,7 @@ def vote_page():
                 session['voted_positions'].append(position)
             session.modified = True
 
-            flash("Vote submitted successfully!", "success")
+            flash(f"You Voted For {position_name} Position", "success")
             return redirect(url_for('vote_page'))
 
         # For GET requests, get current voted positions from database

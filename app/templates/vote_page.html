@@ -182,19 +182,19 @@
         {% endwith %}
 
         <!-- Indicator for voted roles -->
-        <div id="voted-roles" class="mb-4">
-            {% if session.get('voted_positions') %}
-                {% for position_id in session['voted_positions'] %}
-                    {% for position in positions %}
-                        {% if position.id == position_id %}
-                            <div class="alert alert-success">
-                                You Voted For <strong>{{ position.name }}</strong>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}
-            {% endif %}
-        </div>
+<div id="voted-roles" class="mb-4">
+    {% if session.get('voted_positions') %}
+        {% for position_id in session['voted_positions'] %}
+            {% for position in positions %}
+                {% if position.id == position_id %}
+                    <div class="alert alert-success">
+                        You Voted For <strong>{{ position.name }}</strong> Position
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+</div>
 
         <!-- Voting form -->
         <form method="POST" action="/vote-page">
